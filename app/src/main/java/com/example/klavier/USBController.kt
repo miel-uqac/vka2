@@ -12,17 +12,18 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 
-class USBController(context: Context) {
-    var context: Context = context
-    private val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
+class USBController(usbManager: UsbManager) {
+
+    private val usbManager = usbManager as UsbManager
     var m_driver : UsbSerialDriver? = null
     private var m_device : UsbDevice? = null
     var m_connection : UsbDeviceConnection? = null
     var m_port : UsbSerialPort? = null
+    var hasDevicePermission = false
     val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     val WRITE_WAIT_MILLIS = 2000;
 
-    fun ManageUSB() {
+    fun ManageUSB(context: Context) {
         val availableDrivers: List<UsbSerialDriver> =
             UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
         if (availableDrivers.isEmpty()) {
@@ -37,8 +38,9 @@ class USBController(context: Context) {
             val flags =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_MUTABLE else 0
             val intent: PendingIntent =
-                PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
-            if (usbManager.hasPermission(m_driver!!.device)) {
+                PendingIntent.getBroadcast( context,0, Intent(ACTION_USB_PERMISSION), flags)
+            hasDevicePermission = usbManager.hasPermission(m_driver!!.device)
+            if (hasDevicePermission) {
                 // Permission already granted, no need to request
                 connectToDevice()  // Skip to opening the connection
                 Log.i("USB", "USB permission not requested")
@@ -51,8 +53,9 @@ class USBController(context: Context) {
             }
     }
     fun USBWrite(data: String) {
-        Log.i("USB", "USB write")
+        Log.i("USB", m_port.toString())
         m_port?.write((data+"\r\n").toByteArray(), WRITE_WAIT_MILLIS)
+        Log.i("USB", data)
     }
 
     fun USBRead() {
@@ -73,6 +76,7 @@ class USBController(context: Context) {
     fun disconnectFromDevice(){
         m_port?.close()
         m_connection?.close()
+        Log.i("USB", "USB disconnected")
     }
 
 }

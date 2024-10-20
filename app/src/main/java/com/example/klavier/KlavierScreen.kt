@@ -1,5 +1,6 @@
 package com.example.klavier
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -55,8 +56,13 @@ fun KlavierAppBar(
 
 @Composable
 fun KlavierApp(
-    navController: NavHostController = rememberNavController()
-) {
+    usbController: USBController,
+    context: Context,
+    viewModel: USBViewModel = USBViewModel(usbController = usbController, context = context),
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+
+    ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = KlavierScreen.valueOf(
         backStackEntry?.destination?.route ?: KlavierScreen.Start.name
@@ -82,6 +88,7 @@ fun KlavierApp(
             }
             composable(route = KlavierScreen.Main.name) {
                 MainScreen(
+                    sendData = viewModel::writeUSB,
                     onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) }
                 )
             }
