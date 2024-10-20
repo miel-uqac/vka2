@@ -8,7 +8,7 @@ from adafruit_ble.services.standard.hid import HIDService
 from adafruit_ble.services.standard.device_info import DeviceInfoService
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
-from adafruit_hid.keyboard_layout_fr import KeyboardLayout
+from adafruit_hid.keyboard_layout_fr import KeyboardLayoutFR
 from adafruit_hid.keycode import Keycode
 
 """
@@ -36,7 +36,7 @@ else:
     print(ble.connections)
 
 k = Keyboard(hid.devices)
-kl = KeyboardLayout(k)
+kl = KeyboardLayoutFR(k)
 
 """
 LED configuration (just) for debug/test
@@ -94,7 +94,7 @@ while True:
 
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
-            kl.write("Demande de suppression reçu")
+            #kl.write("Demande de suppression reçu")
             
         else:
             kl.write(_str)
