@@ -65,7 +65,7 @@ fun MainScreen(
         }
         Row (modifier  = Modifier.fillMaxSize(0.5f)) {
             when (tabIndex) {
-                0 -> MacrosTab(onSettingsButtonClicked)
+                0 -> MacrosTab(sendData = sendData)
                 1 -> ColorPickerTab()
             }
 
@@ -79,13 +79,19 @@ fun MainScreen(
 
 @Composable
 fun MacrosTab(
-    onSettingsButtonClicked: () -> Unit,
+    sendData: (String) -> Unit,
+    onCopyClicked: () -> Unit = {
+        sendData(R.string.id_copy.toString())
+    },
+    onPasteClicked: () -> Unit = {
+        sendData(R.string.id_paste.toString())
+    },
 )
 {
     Column{
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
             IconButton(
-                onClick = onSettingsButtonClicked,
+                onClick = onCopyClicked,
                 modifier = Modifier,
             ) {
                 Icon(
@@ -93,11 +99,11 @@ fun MacrosTab(
                 )
             }
             IconButton(
-                onClick = onSettingsButtonClicked,
+                onClick = onPasteClicked,
                 modifier = Modifier,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.paste_icon), contentDescription = "copier"
+                    painter = painterResource(R.drawable.paste_icon), contentDescription = "coller"
                 )
             }
         }
