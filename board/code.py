@@ -54,8 +54,8 @@ Main loop
 """
 
 #IDENTIFIANTS SPECIFIQUES 
-idControlC = "CONTROL_C"
-idControlV = "CONTROL_V"
+idControlC = "#$001"
+idControlV = "#$002"
 idBackspace = r"\b"
 
 
@@ -94,7 +94,7 @@ while True:
 
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
-            #kl.write("Demande de suppression reçu")
+            kl.write("Demande de suppression reçu")
             
         else:
             kl.write(_str)
