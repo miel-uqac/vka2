@@ -1,10 +1,12 @@
 package com.example.klavier.ui
 
-
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -25,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
+import com.example.klavier.USBController
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun MainScreen(
@@ -63,7 +67,7 @@ fun MainScreen(
         }
         Row (modifier  = Modifier.fillMaxSize(0.5f)) {
             when (tabIndex) {
-                0 -> MacrosTab(onSettingsButtonClicked)
+                0 -> MacrosTab(sendData = sendData)
                 1 -> ColorPickerTab()
             }
 
@@ -77,13 +81,16 @@ fun MainScreen(
 
 @Composable
 fun MacrosTab(
-    onSettingsButtonClicked: () -> Unit,
+    sendData: (String) -> Unit
 )
 {
+    val context = LocalContext.current
     Column{
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
             IconButton(
-                onClick = onSettingsButtonClicked,
+                onClick = {
+                    sendData(context.getString(R.string.id_copy))
+                },
                 modifier = Modifier,
             ) {
                 Icon(
@@ -91,11 +98,13 @@ fun MacrosTab(
                 )
             }
             IconButton(
-                onClick = onSettingsButtonClicked,
+                onClick = {
+                    sendData(context.getString(R.string.id_paste))
+                },
                 modifier = Modifier,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.paste_icon), contentDescription = "copier"
+                    painter = painterResource(R.drawable.paste_icon), contentDescription = "coller"
                 )
             }
         }
