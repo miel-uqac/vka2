@@ -2,4 +2,6 @@
     <string name="app_name">Klavier</string>
     <string name="splash_screen">Splash Screen</string>
     <string name="settings">Settings</string>
+    <string name="id_copy">#$001</string>
+    <string name="id_paste">#$002</string>
 </resources>
