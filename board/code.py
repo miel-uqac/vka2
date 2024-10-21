@@ -94,7 +94,6 @@ while True:
 
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
-            kl.write("Demande de suppression reçu")
             
         else:
             kl.write(_str)
