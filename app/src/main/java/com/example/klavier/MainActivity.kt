@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -39,18 +40,25 @@ class MainActivity : ComponentActivity() {
 
 
         val filter = IntentFilter().apply{
-        addAction(Companion.ACTION_USB_PERMISSION)
+        addAction(ACTION_USB_PERMISSION)
         addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
         addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
         }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        {
+        registerReceiver(broadcastReceiver, filter, RECEIVER_NOT_EXPORTED)
+        }else{
         registerReceiver(broadcastReceiver, filter)
+        }
+
 
     }
 
     val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
-                Companion.ACTION_USB_PERMISSION -> handleUsbPermission(intent)
+                ACTION_USB_PERMISSION -> handleUsbPermission(intent)
                 UsbManager.ACTION_USB_DEVICE_ATTACHED -> usbController.ManageUSB(context!!)
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> usbController.disconnectFromDevice()
             }
