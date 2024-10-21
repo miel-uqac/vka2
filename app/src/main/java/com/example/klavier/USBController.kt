@@ -12,16 +12,16 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 
-class USBController(usbManager: UsbManager) {
+class USBController(private val usbManager: UsbManager) {
 
-    private val usbManager = usbManager as UsbManager
     var m_driver : UsbSerialDriver? = null
     private var m_device : UsbDevice? = null
     var m_connection : UsbDeviceConnection? = null
     var m_port : UsbSerialPort? = null
     var hasDevicePermission = false
+    var USBConnected = false
     val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
-    val WRITE_WAIT_MILLIS = 2000;
+    val WRITE_WAIT_MILLIS = 2000
 
     fun ManageUSB(context: Context) {
         val availableDrivers: List<UsbSerialDriver> =
@@ -30,6 +30,7 @@ class USBController(usbManager: UsbManager) {
             Log.i("USB", "No drivers found or no device connected")
             return
         }
+        USBConnected = true
         m_driver = availableDrivers[0]
         if (m_driver != null) {
             m_device = m_driver!!.device
@@ -63,6 +64,11 @@ class USBController(usbManager: UsbManager) {
     }
 
     fun connectToDevice(){
+        hasDevicePermission = usbManager.hasPermission(m_driver!!.device)
+        if (!hasDevicePermission) {
+            Log.i("USB", "USB permission not granted")
+            return
+        }
         m_connection = usbManager.openDevice(m_driver?.device)
         m_port = m_driver?.ports?.get(0)
         if (m_port != null) {
@@ -76,6 +82,8 @@ class USBController(usbManager: UsbManager) {
     fun disconnectFromDevice(){
         m_port?.close()
         m_connection?.close()
+        USBConnected = false
+        hasDevicePermission = false
         Log.i("USB", "USB disconnected")
     }
 

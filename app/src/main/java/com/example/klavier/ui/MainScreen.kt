@@ -1,12 +1,11 @@
 package com.example.klavier.ui
 
-import android.annotation.SuppressLint
-import android.util.Log
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -24,10 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
-import com.example.klavier.USBController
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
@@ -127,6 +128,7 @@ fun ColorPickerTab()
 @Composable
 fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
     var input by remember { mutableStateOf("") }
+    val backspaceKeyCode = Key.Backspace.nativeKeyCode
     val backspace: String = """\b"""
     TextField(
             value = input,
@@ -134,7 +136,7 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
 
                 val addedText =
                 if (newText.isNotEmpty()) {
-                    findFirstDifferenceIndex(newText, input)?.let {
+                    findFirstDifferenceIndex(newText, input).let {
                         if (it >= 0) {
                             for (i in 1..it) {
                                 sendData(backspace)
@@ -154,7 +156,7 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
                     }
                 }else{
                         sendData(backspace)
-                        "."
+                        ""
                     }
 
                 input = if (addedText != ".") newText else ""
@@ -165,6 +167,14 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
 
             },
             label = { Text("Label") },
+            modifier = Modifier.onKeyEvent { keyEvent ->
+                if (keyEvent.nativeKeyEvent.keyCode == backspaceKeyCode && input.isEmpty()) {
+                    sendData(backspace)
+                    true
+                } else {
+                    false
+                }}
+                .fillMaxWidth(),
             singleLine = true,
             textStyle = TextStyle(color = Color.Transparent) // Le texte est également invisible
         )

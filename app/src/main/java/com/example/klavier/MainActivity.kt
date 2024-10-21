@@ -21,18 +21,19 @@ import com.example.klavier.ui.theme.KlavierTheme
 class MainActivity : ComponentActivity() {
 
     lateinit var usbController : USBController
+    lateinit var viewModel : USBViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         usbController = USBController(usbManager = getSystemService(Context.USB_SERVICE) as UsbManager)
+        viewModel = USBViewModel(usbController,this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             KlavierTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     KlavierApp(
-                        usbController = usbController,
-                        context = this,
+                        viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding))
                 }
             }
@@ -59,8 +60,8 @@ class MainActivity : ComponentActivity() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
                 ACTION_USB_PERMISSION -> handleUsbPermission(intent)
-                UsbManager.ACTION_USB_DEVICE_ATTACHED -> usbController.ManageUSB(context!!)
-                UsbManager.ACTION_USB_DEVICE_DETACHED -> usbController.disconnectFromDevice()
+                UsbManager.ACTION_USB_DEVICE_ATTACHED -> viewModel.ManageUSB(context!!)
+                UsbManager.ACTION_USB_DEVICE_DETACHED -> viewModel.disconnectUSB()
             }
     }
 
@@ -69,8 +70,7 @@ class MainActivity : ComponentActivity() {
         Log.i("USB", intent.extras.toString())
         if (granted) {
             try {
-                usbController.connectToDevice()
-                usbController.USBWrite("red")
+                viewModel.connectToDevice()
             } catch (e: Exception) {
                 Log.e("USB", "Error connecting to device: ${e.message}")
             }

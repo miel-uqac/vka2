@@ -14,16 +14,37 @@ class USBViewModel(private val usbController: USBController,context: Context) : 
     val isConnected: LiveData<Boolean> = _isConnected
 
     init {
+        ManageUSB(context)
+    }
+
+    fun ManageUSB(context: Context) {
         usbController.ManageUSB(context)
+        checkConnected()
         checkUSBPermission()
     }
 
-    fun checkUSBPermission() {
-        _hasPermission.value = usbController.hasDevicePermission
+    fun connectToDevice() {
+        usbController.connectToDevice()
+        checkConnected()
+        checkUSBPermission()
+    }
+
+    fun disconnectUSB() {
+        usbController.disconnectFromDevice()
+        checkConnected()
+        checkUSBPermission()
     }
 
     fun writeUSB(data: String) {
         usbController.USBWrite(data)
+    }
+
+    fun checkConnected() {
+        _isConnected.value = usbController.USBConnected
+    }
+
+    fun checkUSBPermission() {
+        _hasPermission.value = usbController.hasDevicePermission
     }
 
 }
