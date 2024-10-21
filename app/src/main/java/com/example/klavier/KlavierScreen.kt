@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -98,6 +99,11 @@ fun KlavierApp(
                 SettingsScreen(
                     onBackButtonClicked = { navController.navigate(route = KlavierScreen.Main.name) }
                 )
+            }
+        }
+        LaunchedEffect(!hasPermission) {
+            if(!hasPermission) {
+                navController.navigate(route =KlavierScreen.Start.name)
             }
         }
     }

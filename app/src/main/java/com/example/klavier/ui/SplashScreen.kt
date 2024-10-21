@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,7 +22,6 @@ fun SplashScreen(
     modifier: Modifier = Modifier
 )
 {
-    var accessGranted by remember { mutableStateOf(false) }
 
     Box(modifier) {
         Image(
@@ -35,7 +31,7 @@ fun SplashScreen(
             modifier = Modifier.align(Alignment.Center)
                                 .fillMaxSize()
         )
-            var value = ""
+            var value: String = ""
             if(!connected){
                 value = "Veuillez connecter le MC"
             }
@@ -44,14 +40,7 @@ fun SplashScreen(
                     value = "Veuillez autoriser l'accès USB"
                 }
                 else{
-                    if (!accessGranted) {
-                        accessGranted = true
-                        onGranted()
-                        Log.i("USB", "USB permission granted")
-                    }
-                    else{
                         value = "Chargement..."
-                    }
                 }
             )
 
@@ -60,5 +49,10 @@ fun SplashScreen(
                     lineHeight = 116.sp,
                     modifier = Modifier.align(Alignment.Center)
                 )
+    }
+    LaunchedEffect(hasPermission) {
+        if(hasPermission) {
+            onGranted()
+        }
     }
 }
