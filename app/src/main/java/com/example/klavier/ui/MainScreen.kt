@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.klavier.R
 import com.example.klavier.USBController
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun MainScreen(
@@ -79,19 +80,16 @@ fun MainScreen(
 
 @Composable
 fun MacrosTab(
-    sendData: (String) -> Unit,
-    onCopyClicked: () -> Unit = {
-        sendData(R.string.id_copy.toString())
-    },
-    onPasteClicked: () -> Unit = {
-        sendData(R.string.id_paste.toString())
-    },
+    sendData: (String) -> Unit
 )
 {
+    val context = LocalContext.current
     Column{
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
             IconButton(
-                onClick = onCopyClicked,
+                onClick = {
+                    sendData(context.getString(R.string.id_copy))
+                },
                 modifier = Modifier,
             ) {
                 Icon(
@@ -99,7 +97,9 @@ fun MacrosTab(
                 )
             }
             IconButton(
-                onClick = onPasteClicked,
+                onClick = {
+                    sendData(context.getString(R.string.id_paste))
+                },
                 modifier = Modifier,
             ) {
                 Icon(
