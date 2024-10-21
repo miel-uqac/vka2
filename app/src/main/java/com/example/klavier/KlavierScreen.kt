@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
@@ -55,9 +56,14 @@ fun KlavierAppBar(
 
 @Composable
 fun KlavierApp(
-    navController: NavHostController = rememberNavController()
-) {
+    viewModel: USBViewModel,
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+
+    ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
+    val connected by viewModel.isConnected.observeAsState(false)
+    val hasPermission by viewModel.hasPermission.observeAsState(false)
     val currentScreen = KlavierScreen.valueOf(
         backStackEntry?.destination?.route ?: KlavierScreen.Start.name
     )
@@ -77,11 +83,14 @@ fun KlavierApp(
         ) {
             composable(route = KlavierScreen.Start.name) {
                 SplashScreen(
-                    onContinueClicked = { navController.navigate(route = KlavierScreen.Main.name) }
+                    connected = connected,
+                    hasPermission = hasPermission,
+                    onGranted = { navController.navigate(route = KlavierScreen.Main.name) }
                 )
             }
             composable(route = KlavierScreen.Main.name) {
                 MainScreen(
+                    sendData = viewModel::writeUSB,
                     onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) }
                 )
             }
