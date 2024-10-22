@@ -138,7 +138,7 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
                 if (newText.isNotEmpty()) {
                     findFirstDifferenceIndex(newText, input).let {
                         if (it >= 0) {
-                            for (i in 1..it) {
+                            for (i in it..input.length-1) {
                                 sendData(backspace)
                             }
                             newText.substring(it)
