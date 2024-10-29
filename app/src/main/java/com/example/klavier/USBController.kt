@@ -38,8 +38,14 @@ class USBController(private val usbManager: UsbManager) {
 
             val flags =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_MUTABLE else 0
-            val intent: PendingIntent =
-                PendingIntent.getBroadcast( context,0, Intent(ACTION_USB_PERMISSION), flags)
+            val intent: PendingIntent = if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (U) */) {
+                val intent =  Intent(ACTION_USB_PERMISSION)
+                intent.setPackage(context.packageName)
+                PendingIntent.getBroadcast(context, 0, intent, flags)
+            }
+            else{
+                PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
+            }
             hasDevicePermission = usbManager.hasPermission(m_driver!!.device)
             if (hasDevicePermission) {
                 // Permission already granted, no need to request
