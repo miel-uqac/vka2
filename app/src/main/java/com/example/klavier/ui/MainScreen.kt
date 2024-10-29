@@ -1,18 +1,29 @@
 package com.example.klavier.ui
 
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +41,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 
 @Composable
 fun MainScreen(
@@ -50,6 +64,7 @@ fun MainScreen(
             )
             IconButton(
                 onClick = onSettingsButtonClicked,
+                modifier = Modifier.align(Alignment.CenterVertically)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
@@ -167,13 +182,15 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
 
             },
             label = { Text("Label") },
-            modifier = Modifier.onKeyEvent { keyEvent ->
-                if (keyEvent.nativeKeyEvent.keyCode == backspaceKeyCode && input.isEmpty()) {
-                    sendData(backspace)
-                    true
-                } else {
-                    false
-                }}
+            modifier = Modifier
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.nativeKeyEvent.keyCode == backspaceKeyCode && input.isEmpty()) {
+                        sendData(backspace)
+                        true
+                    } else {
+                        false
+                    }
+                }
                 .fillMaxWidth(),
             singleLine = true,
             textStyle = TextStyle(color = Color.Transparent) // Le texte est également invisible
@@ -184,4 +201,99 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
 
 fun findFirstDifferenceIndex(str1: String, str2: String): Int {
     return str1.zip(str2).indexOfFirst { (char1, char2) -> char1 != char2 }
+}
+
+@Composable
+fun AddMacrosDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+)
+{
+    Dialog(onDismissRequest = { onDismissRequest() })
+    {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(375.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        )
+        {
+            Column (modifier = Modifier.align(Alignment.CenterHorizontally)){
+                Text(
+                    text = "Selectionnez les macros à ajouter.",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                )
+
+                OutlinedCard(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .size(width = 240.dp, height = 100.dp)
+                )
+                {
+                    Column(modifier = Modifier.align(Alignment.CenterHorizontally)){
+                        MacroChip(
+                            "test", R.drawable.copy_icon, {}
+                        )
+                        MacroChip(
+                            "test22", R.drawable.copy_icon, {}
+                        )
+                        MacroChip(
+                            "test333", R.drawable.copy_icon, {}
+                        )
+                        MacroChip(
+                            "test4444", R.drawable.copy_icon, {}
+                        )
+                        MacroChip(
+                            "test55555", R.drawable.copy_icon, {}
+                        )
+                    }
+                }
+
+                Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
+                    TextButton(
+                        onClick = { onConfirmation() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Ajouter")
+                    }
+                    TextButton(
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Annuler")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MacroChip(
+    label: String,
+    @DrawableRes iconResource: Int,
+    onClick: () -> Unit,
+) {
+    var selected by remember { mutableStateOf(false) }
+
+    FilterChip(
+        onClick = { onClick(); selected = !selected },
+        label = {
+            Icon(painter = painterResource(iconResource), contentDescription = label)
+            Text(label)
+        },
+        selected = selected,
+    )
+}
+
+@Preview
+@Composable
+fun MacroDialogPreview()
+{
+    AddMacrosDialog(
+        {},
+    ) { }
 }
