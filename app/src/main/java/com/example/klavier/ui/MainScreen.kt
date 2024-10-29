@@ -15,6 +15,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
@@ -130,6 +134,7 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
     var input by remember { mutableStateOf("") }
     val backspaceKeyCode = Key.Backspace.nativeKeyCode
     val backspace: String = """\b"""
+    val focusRequester = remember { FocusRequester() }
     TextField(
             value = input,
             onValueChange = { newText ->
@@ -174,10 +179,17 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
                 } else {
                     false
                 }}
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .alpha(0f)
+                .focusRequester(focusRequester),
             singleLine = true,
-            textStyle = TextStyle(color = Color.Transparent) // Le texte est également invisible
+            textStyle = TextStyle(color = Color.Transparent), // Le texte est également invisible,
+
+
         )
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
 }
 
