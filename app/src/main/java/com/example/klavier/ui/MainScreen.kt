@@ -86,7 +86,7 @@ fun MainScreen(
         Row (modifier  = Modifier.fillMaxSize(1f)) {
             when (tabIndex) {
                 0 -> MacrosTab(sendData = sendData)
-                1 -> ColorPickerTab()
+                1 -> ColorPickerTab(sendData = sendData)
             }
 
         }
@@ -128,9 +128,11 @@ fun MacrosTab(
         }
     }
 }
-@Preview
+
 @Composable
-fun ColorPickerTab()
+fun ColorPickerTab(
+    sendData: (String) -> Unit
+)
 {
     val controller = rememberColorPickerController()
     var hexCode by remember { mutableStateOf("") }
@@ -221,7 +223,9 @@ fun ColorPickerTab()
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Button(onClick = { /* TODO: Envoie de la couleur  */ }) {
+            Button(onClick = {
+                    sendData("#$hexCode");
+            }) {
                 Text(text = "Envoyer")
             }
 
