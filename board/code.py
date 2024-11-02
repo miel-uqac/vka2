@@ -10,6 +10,7 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keyboard_layout_fr import KeyboardLayoutFR
 from adafruit_hid.keycode import Keycode
+from adafruit_hid.mouse import Mouse
 
 """
 Import for LED and I/O serial communication
@@ -37,6 +38,7 @@ else:
 
 k = Keyboard(hid.devices)
 kl = KeyboardLayoutFR(k)
+m = Mouse(hid.devices)
 
 """
 LED configuration (just) for debug/test
@@ -49,15 +51,67 @@ led_red.direction = digitalio.Direction.OUTPUT
 led_green.direction = digitalio.Direction.OUTPUT
 led_blue.direction = digitalio.Direction.OUTPUT
 
+
+
+#IDENTIFIANTS SPECIFIQUES 
+#---MACROS---
+idControlC = "#$001"
+idControlV = "#$002"
+
+#---CLAVIER---
+idBackspace = r"\b"
+
+#---SOURIS---
+idMouseLeftClick = "#$M01"
+idMouseRightClick = "#$M02"
+idMouseMove = "#$M1" #Sera suivit de la distance
+idMouseSlide = "#$M2" #Sera suivit de la direction (V = vertical ou H = horizontal) et de la distance 
+
+
+def macroAction(_str):
+    if _str == idControlC:
+        k.press(Keycode.CONTROL, Keycode.C)
+        k.release_all()
+
+    elif _str == idControlV:
+        k.press(Keycode.CONTROL, Keycode.V)
+        k.release_all()
+
+    else:
+        return True
+
+    return False
+
+def mouseAction(_str):
+    
+    if _str == idMouseLeftClick:
+        m.click(Mouse.LEFT_BUTTON)
+
+    elif _str == idMouseRightClick:
+        m.click(Mouse.RIGHT_BUTTON)
+        
+    elif _str.startswith(idMouseMove):
+        deplacement = _str[len(idMouseMove):]
+
+        
+    elif _str.startswith(idMouseSlide):
+        deplacement = _str[len(idMouseSlide):]
+        
+        if(deplacement.startswith("H")):
+            deplacement = deplacement[1:]
+            m.move(wheel=int(deplacement))
+
+        #elif(deplacement.startswith("V")):salltest
+        
+    else:
+        return True
+
+    return False
+
+
 """
 Main loop
 """
-
-#IDENTIFIANTS SPECIFIQUES 
-idControlC = "#$001"
-idControlV = "#$002"
-idBackspace = r"\b"
-
 
 while True:
     while not ble.connected:
@@ -66,36 +120,19 @@ while True:
     while ble.connected:
         _str = input() # read serial communication (type and press ENTER or RETURN)
         
-        if _str == "red":
-            led_red.value = False
-            led_green.value = True
-            led_blue.value = True
-            kl.write("Light is now red")
+        envoie = True #permet l'envoie du str brut 
+    
+        if _str.startswith("#$0"):
+            envoie = macroAction(_str)
 
-        elif _str == "green":
-            led_red.value = True
-            led_green.value = False
-            led_blue.value = True
-            kl.write("Light is now green")
-
-        elif _str == "blue":
-            led_red.value = True
-            led_green.value = True
-            led_blue.value = False
-            kl.write("Light is now blue")
-
-        elif _str == idControlC:
-            k.press(Keycode.CONTROL, Keycode.C)
-            k.release_all()
-
-        elif _str == idControlV:
-            k.press(Keycode.CONTROL, Keycode.V)
-            k.release_all()
-
+        elif _str.startswith("#$M"):
+            envoie = mouseAction(_str)
+        
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
-            
-        else:
+            envoie = False
+        
+        if envoie:
             kl.write(_str)
 
     ble.start_advertising(advertisement)
