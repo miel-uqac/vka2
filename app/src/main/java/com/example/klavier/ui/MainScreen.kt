@@ -1,16 +1,21 @@
 package com.example.klavier.ui
 
 
+import android.graphics.Paint.Align
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -60,16 +65,15 @@ fun MainScreen(
         ){
             Text(
                 "Klavier",
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
+                modifier = Modifier.align(Alignment.CenterVertically))
+
             IconButton(
                 onClick = onSettingsButtonClicked,
                 modifier = Modifier.align(Alignment.CenterVertically)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
-                    contentDescription = "Settings"
-                )
+                    contentDescription = "Settings")
             }
         }
         TabRow(
@@ -121,6 +125,23 @@ fun MacrosTab(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.paste_icon), contentDescription = "coller"
+                )
+            }
+        }
+        Row(modifier = Modifier)
+        {
+            var showDialog by remember { mutableStateOf(false) }
+            if (showDialog) {
+                AddMacrosDialog(onDismissRequest = { showDialog = false }, onConfirmation = { showDialog = false })
+            }
+            IconButton(
+                onClick = {
+                    showDialog = true
+                },
+                modifier = Modifier,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.add_icon), contentDescription = "ajouter une macro"
                 )
             }
         }
@@ -219,10 +240,16 @@ fun AddMacrosDialog(
             shape = RoundedCornerShape(16.dp),
         )
         {
-            Column (modifier = Modifier.align(Alignment.CenterHorizontally)){
+            Column (modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxHeight()
+                .padding(top = 20.dp, bottom = 20.dp)
+            ){
                 Text(
                     text = "Selectionnez les macros à ajouter.",
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 10.dp)
                 )
 
                 OutlinedCard(
@@ -230,29 +257,34 @@ fun AddMacrosDialog(
                         containerColor = MaterialTheme.colorScheme.surface,
                     ),
                     modifier = Modifier
-                        .size(width = 240.dp, height = 100.dp)
+                        .size(width = 240.dp, height = 200.dp)
                 )
                 {
-                    Column(modifier = Modifier.align(Alignment.CenterHorizontally)){
+                    Column(modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .verticalScroll(rememberScrollState())
+                    ){
                         MacroChip(
-                            "test", R.drawable.copy_icon, {}
+                            "test", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test22", R.drawable.copy_icon, {}
+                            "test22", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test333", R.drawable.copy_icon, {}
+                            "test333", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test4444", R.drawable.copy_icon, {}
+                            "test4444", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test55555", R.drawable.copy_icon, {}
+                            "test55555", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }
 
-                Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
+                Row(modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                ){
                     TextButton(
                         onClick = { onConfirmation() },
                         modifier = Modifier.padding(8.dp),
@@ -276,6 +308,7 @@ fun MacroChip(
     label: String,
     @DrawableRes iconResource: Int,
     onClick: () -> Unit,
+    modifier: Modifier
 ) {
     var selected by remember { mutableStateOf(false) }
 
@@ -286,6 +319,7 @@ fun MacroChip(
             Text(label)
         },
         selected = selected,
+        modifier = modifier
     )
 }
 
