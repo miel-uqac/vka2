@@ -1,5 +1,8 @@
 package com.example.klavier.ui
 
+import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,11 +38,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
@@ -51,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
@@ -87,9 +94,15 @@ fun MainScreen(
                 )
             }
         }
-        Row (modifier  = Modifier.fillMaxSize(1f)) {
+        Column (modifier  = Modifier.fillMaxSize(1f)) {
             when (tabIndex) {
-                0 -> MacrosTab(sendData = sendData)
+                0 -> {
+                    MacrosTab(sendData = sendData)
+                    //----------test----------
+                    TouchPad(sendData = sendData)
+                    //----------test----------
+                }
+
                 1 -> ColorPickerTab(sendData = sendData)
             }
 
@@ -99,6 +112,15 @@ fun MainScreen(
             keyboardInput(sendData)
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    MainScreen(
+        sendData = { /* Action de test pour sendData */ },
+        onSettingsButtonClicked = { /* Action de test pour le bouton paramètres */ }
+    )
 }
 
 @Composable
@@ -141,17 +163,12 @@ fun ColorPickerTab(
     val controller = rememberColorPickerController()
     var hexCode by remember { mutableStateOf("") }
     var textColor by remember { mutableStateOf(Color.Transparent) }
-    Row(
-        //modifier = Modifier.fillMaxSize(),
-        //horizontalArrangement = Arrangement.SpaceEvenly // Répartit l'espace de manière équilibrée
-    ) {
+    Row() {
         Column(
             modifier = Modifier
                 .weight(0.8f),
-                //.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Premier élément
             Box(
                 modifier = Modifier
                     .padding(10.dp)
@@ -193,7 +210,6 @@ fun ColorPickerTab(
                     .fillMaxWidth()
                     .padding(10.dp)
                     .height(35.dp),
-                    //.align(Alignment.CenterHorizontally),
                 controller = controller,
             )
         }
@@ -308,4 +324,37 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
 
 fun findFirstDifferenceIndex(str1: String, str2: String): Int {
     return str1.zip(str2).indexOfFirst { (char1, char2) -> char1 != char2 }
+}
+
+@Composable
+fun TouchPad(
+    sendData: (String) -> Unit
+) {
+    var lastPosition by remember { mutableStateOf(Offset.Zero) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth() // Prend toute la largeur de l'écran
+            .fillMaxHeight(0.6f)
+            .background(Color.LightGray) //FOR DEBUG
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        sendData(context.getString(R.string.id_click_gauche))
+                    },
+                    onDoubleTap = { offset ->
+                        sendData(context.getString(R.string.id_click_gauche))
+                        sendData(context.getString(R.string.id_click_gauche))
+                    },
+                    onLongPress = { offset ->
+                        sendData(context.getString(R.string.id_click_droit))
+                    },
+                    onPress = { offset ->
+                        //TODO Utiliser ça pour glisser ou pas ?
+                    }
+                )
+            }
+    )
 }
