@@ -1,18 +1,20 @@
 package com.example.klavier.ui
 
 
-import android.graphics.Paint.Align
+import android.content.Context
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -46,14 +48,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
 fun MainScreen(
     sendData: (String) -> Unit,
-    onSettingsButtonClicked : () -> Unit = {}
+    onSettingsButtonClicked : () -> Unit = {},
+    macroLabels: ArrayList<String>,
+    macroIcons: ArrayList<Int>,
+    macroFunctions: ArrayList<() -> Unit>
 )
 {
     var tabIndex by remember { mutableIntStateOf(0) }
@@ -85,9 +89,9 @@ fun MainScreen(
                 )
             }
         }
-        Row (modifier  = Modifier.fillMaxSize(0.5f)) {
+        Row (modifier  = Modifier.fillMaxWidth(1f)) {
             when (tabIndex) {
-                0 -> MacrosTab(sendData = sendData)
+                0 -> MacrosTab(sendData = sendData, macroLabels, macroIcons, macroFunctions)
                 1 -> ColorPickerTab()
             }
 
@@ -101,38 +105,51 @@ fun MainScreen(
 
 @Composable
 fun MacrosTab(
-    sendData: (String) -> Unit
+    sendData: (String) -> Unit,
+    macroLabels: ArrayList<String>,
+    macroIcons: ArrayList<Int>,
+    macroFunctions: ArrayList<() -> Unit>
 )
 {
     val context = LocalContext.current
     Column{
-        Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
-            IconButton(
-                onClick = {
-                    sendData(context.getString(R.string.id_copy))
-                },
-                modifier = Modifier,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.copy_icon), contentDescription = "copier"
+        LazyRow(
+            modifier = Modifier
+                .height(50.dp)
+        ) {
+            // macro copier
+            item{
+                GridItem(
+                    onClick = {
+                        sendData(context.getString(R.string.id_copy))
+                    },
+                    painter = R.drawable.copy_icon,
+                    contentDescription = "copier"
                 )
             }
-            IconButton(
-                onClick = {
-                    sendData(context.getString(R.string.id_paste))
-                },
-                modifier = Modifier,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.paste_icon), contentDescription = "coller"
+            // macro coller
+            item{
+                GridItem(
+                    onClick = {
+                        sendData(context.getString(R.string.id_paste))
+                    },
+                    painter = R.drawable.paste_icon,
+                    contentDescription = "coller"
+                )
+            }
+            items(macroLabels) {arrayItem ->
+                GridItem(
+                    onClick = macroFunctions[macroLabels.indexOf(arrayItem)],
+                    painter = macroIcons[macroLabels.indexOf(arrayItem)],
+                    contentDescription = arrayItem
                 )
             }
         }
-        Row(modifier = Modifier)
+        Row(modifier = Modifier.align(Alignment.Start))
         {
             var showDialog by remember { mutableStateOf(false) }
             if (showDialog) {
-                AddMacrosDialog(onDismissRequest = { showDialog = false }, onConfirmation = { showDialog = false })
+                AddMacrosDialog(onDismissRequest = { showDialog = false }, onConfirmation = { showDialog = false }, context, sendData, macroLabels, macroIcons, macroFunctions)
             }
             IconButton(
                 onClick = {
@@ -228,6 +245,11 @@ fun findFirstDifferenceIndex(str1: String, str2: String): Int {
 fun AddMacrosDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
+    context : Context,
+    sendData: (String) -> Unit,
+    macroLabels : ArrayList<String>,
+    macroIcons : ArrayList<Int>,
+    macroFunctions : ArrayList<() -> Unit>
 )
 {
     Dialog(onDismissRequest = { onDismissRequest() })
@@ -265,19 +287,34 @@ fun AddMacrosDialog(
                         .verticalScroll(rememberScrollState())
                     ){
                         MacroChip(
-                            "test", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
+                            "couper", R.drawable.cut_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test22", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
+                            "tout selectionner", R.drawable.select_all_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test333", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
+                            "undo", R.drawable.undo_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test4444", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
+                            "redo", R.drawable.redo_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "test55555", R.drawable.copy_icon, {}, Modifier.align(Alignment.CenterHorizontally)
+                            "chercher", R.drawable.find_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "chercher et remplacer", R.drawable.find_replace_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "imprimer", R.drawable.print_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "gras", R.drawable.bold_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "italique", R.drawable.italic_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "souligner", R.drawable.underline_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }
@@ -308,26 +345,50 @@ fun MacroChip(
     label: String,
     @DrawableRes iconResource: Int,
     onClick: () -> Unit,
+    macroLabels : ArrayList<String>,
+    macroIcons : ArrayList<Int>,
+    macroFunctions : ArrayList<() -> Unit>,
     modifier: Modifier
 ) {
     var selected by remember { mutableStateOf(false) }
 
     FilterChip(
-        onClick = { onClick(); selected = !selected },
+        onClick = {
+            selected = !selected
+            if (selected) {
+                if (!macroLabels.contains(label)) {
+                    macroLabels.add(label)
+                    macroIcons.add(iconResource)
+                    macroFunctions.add(onClick)
+                }
+            }
+            else {
+                macroLabels.remove(label)
+                macroIcons.remove(iconResource)
+                macroFunctions.remove(onClick)
+            }
+        },
         label = {
             Icon(painter = painterResource(iconResource), contentDescription = label)
             Text(label)
         },
         selected = selected,
-        modifier = modifier
     )
 }
 
-@Preview
 @Composable
-fun MacroDialogPreview()
+fun GridItem(
+    onClick: () -> Unit,
+    painter: Int,
+    contentDescription: String
+)
 {
-    AddMacrosDialog(
-        {},
-    ) { }
+    IconButton(
+        onClick = onClick,
+    ) {
+        Icon(
+            painter = painterResource(painter),
+            contentDescription = contentDescription
+        )
+    }
 }
