@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.asLiveData
@@ -73,6 +76,11 @@ fun KlavierApp(
     val currentScreen = KlavierScreen.valueOf(
         backStackEntry?.destination?.route ?: KlavierScreen.Start.name
     )
+
+    var macroLabels by remember { mutableStateOf(ArrayList<String>()) }
+    var macroIcons by remember { mutableStateOf(ArrayList<Int>()) }
+    var macroFunctions by remember { mutableStateOf(ArrayList<() -> Unit>()) }
+
     Scaffold(
        /* topBar = {
             KlavierAppBar(
@@ -97,7 +105,10 @@ fun KlavierApp(
             composable(route = KlavierScreen.Main.name) {
                 MainScreen(
                     sendData = viewModel::writeUSB,
-                    onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) }
+                    onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) },
+                    macroLabels,
+                    macroIcons,
+                    macroFunctions
                 )
             }
             composable(route = KlavierScreen.Settings.name) {
