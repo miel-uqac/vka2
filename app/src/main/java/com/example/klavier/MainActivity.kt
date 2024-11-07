@@ -14,7 +14,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.asLiveData
+import com.example.klavier.data.SettingPreferenceRepository
 import com.example.klavier.ui.theme.KlavierTheme
 
 
@@ -22,18 +28,27 @@ class MainActivity : ComponentActivity() {
 
     lateinit var usbController : USBController
     lateinit var viewModel : USBViewModel
+    lateinit var SettingViewModel : SettingModelView
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         usbController = USBController(usbManager = getSystemService(Context.USB_SERVICE) as UsbManager)
         viewModel = USBViewModel(usbController,this)
+        SettingViewModel = SettingModelView(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB,this)
+
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            KlavierTheme {
+            val isDarkTheme = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.isDarkTheme ?: false
+            KlavierTheme(darkTheme = isDarkTheme) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     KlavierApp(
                         viewModel = viewModel,
+                        SettingViewModel = SettingViewModel,
+                        isDarkTheme = isDarkTheme,
                         modifier = Modifier.padding(innerPadding))
                 }
             }
@@ -86,7 +101,9 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
+        private const val USER_PREFERENCES_NAME = "user_preferences"
         const val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+        private val Context.preferencesDataStore: DataStore<Preferences> by preferencesDataStore(name = USER_PREFERENCES_NAME)
     }
 }
 
