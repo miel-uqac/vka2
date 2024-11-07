@@ -78,11 +78,17 @@ fun SplashScreen(
                     }
 
                 }
-
     }
     LaunchedEffect(hasPermission) {
         if(hasPermission) {
             onGranted()
         }
     }
+}
+
+@Composable
+@Preview
+fun splashScreenPreview()
+{
+    SplashScreen(false, false, {}, Modifier)
 }
