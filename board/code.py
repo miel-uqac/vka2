@@ -57,6 +57,8 @@ Main loop
 idControlC = "#$001"
 idControlV = "#$002"
 idBackspace = r"\b"
+idUsLayout = "#$L0"
+idFrLayout = "#$L1"
 
 
 while True:
@@ -94,6 +96,12 @@ while True:
 
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
+
+        elif _str == idUsLayout:
+            kl = KeyboardLayoutUS(k)
+
+        elif _str == idFrLayout:
+            kl = KeyboardLayoutFR(k)
             
         else:
             kl.write(_str)

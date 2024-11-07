@@ -16,11 +16,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.asLiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.klavier.data.Layout
 import com.example.klavier.ui.MainScreen
 import com.example.klavier.ui.SettingsScreen
 import com.example.klavier.ui.SplashScreen
@@ -58,13 +60,16 @@ fun KlavierAppBar(
 @Composable
 fun KlavierApp(
     viewModel: USBViewModel,
+    SettingViewModel: SettingModelView,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    isDarkTheme: Boolean,
 
     ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val connected by viewModel.isConnected.observeAsState(false)
     val hasPermission by viewModel.hasPermission.observeAsState(false)
+    val currentLayout = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.layout ?: Layout.FR
     val currentScreen = KlavierScreen.valueOf(
         backStackEntry?.destination?.route ?: KlavierScreen.Start.name
     )
@@ -97,6 +102,10 @@ fun KlavierApp(
             }
             composable(route = KlavierScreen.Settings.name) {
                 SettingsScreen(
+                    ChangeTheme = SettingViewModel::updateDarkTheme,
+                    isDarkTheme = isDarkTheme,
+                    SetLayout = SettingViewModel::updateLayout,
+                    actualLayout = currentLayout,
                     onBackButtonClicked = { navController.navigate(route = KlavierScreen.Main.name) }
                 )
             }
