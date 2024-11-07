@@ -4,5 +4,15 @@
     <string name="settings">Settings</string>
     <string name="id_copy">#$001</string>
     <string name="id_paste">#$002</string>
+    <string name='id_cut'>#$003</string>
+    <string name="id_select_all">#$004</string>
+    <string name='id_undo'>#$005</string>
+    <string name='id_redo'>#$006</string>
+    <string name='id_search'>#$007</string>
+    <string name='id_search_replace'>#$008</string>
+    <string name='id_print'>#$009</string>
+    <string name='id_gras'>#$010</string>
+    <string name='id_souligne'>#$011</string>
+    <string name='id_italique'>#$012</string>
     <string name="id_layout">#$L</string>
 </resources>

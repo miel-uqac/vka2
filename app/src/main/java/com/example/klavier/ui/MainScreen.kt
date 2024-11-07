@@ -3,13 +3,11 @@ package com.example.klavier.ui
 
 import android.content.Context
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -48,7 +46,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
@@ -57,15 +54,10 @@ import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.*
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
@@ -404,34 +396,34 @@ fun AddMacrosDialog(
                         .verticalScroll(rememberScrollState())
                     ){
                         MacroChip(
-                            "couper", R.drawable.cut_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "couper", R.drawable.cut_icon, {sendData(context.getString(R.string.id_cut))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "tout selectionner", R.drawable.select_all_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "tout selectionner", R.drawable.select_all_icon, {sendData(context.getString(R.string.id_select_all))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "undo", R.drawable.undo_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "undo", R.drawable.undo_icon, {sendData(context.getString(R.string.id_undo))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "redo", R.drawable.redo_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "redo", R.drawable.redo_icon, {sendData(context.getString(R.string.id_redo))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "chercher", R.drawable.find_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "chercher", R.drawable.find_icon, {sendData(context.getString(R.string.id_search))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "chercher et remplacer", R.drawable.find_replace_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "chercher et remplacer", R.drawable.find_replace_icon, {sendData(context.getString(R.string.id_search_replace))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "imprimer", R.drawable.print_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "imprimer", R.drawable.print_icon, {sendData(context.getString(R.string.id_print))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "gras", R.drawable.bold_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "gras", R.drawable.bold_icon, {sendData(context.getString(R.string.id_gras))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "italique", R.drawable.italic_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "italique", R.drawable.italic_icon, {sendData(context.getString(R.string.id_italique))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "souligner", R.drawable.underline_icon, {}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "souligner", R.drawable.underline_icon, {sendData(context.getString(R.string.id_souligne))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }

@@ -56,6 +56,16 @@ Main loop
 #IDENTIFIANTS SPECIFIQUES 
 idControlC = "#$001"
 idControlV = "#$002"
+idControlX = "#$003"
+idControlA = "#$004"
+idControlZ = "#$005"
+idControlY = "#$006"
+idControlF = "#$007"
+idControlH = "#$008"
+idControlP = "#$009"
+idControlB = "#$010"
+idControlI = "#$011"
+idControlD = "#$012"
 idBackspace = r"\b"
 idUsLayout = "#$L0"
 idFrLayout = "#$L1"
@@ -96,6 +106,46 @@ while True:
 
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
+
+        elif _str == idControlX:
+            k.press(Keycode.CONTROL,Keycode.X)
+            k.release_all()
+        
+        elif _str == idControlA:
+            k.press(Keycode.CONTROL,Keycode.A)
+            k.release_all()
+
+        elif _str == idControlZ:
+            k.press(Keycode.CONTROL,Keycode.Z)
+            k.release_all()
+        
+        elif _str == idControlY:
+            k.press(Keycode.CONTROL,Keycode.Y)
+            k.release_all()
+        
+        elif _str == idControlF:
+            k.press(Keycode.CONTROL,Keycode.F)
+            k.release_all()
+        
+        elif _str == idControlH:
+            k.press(Keycode.CONTROL,Keycode.H)
+            k.release_all()
+        
+        elif _str == idControlP:
+            k.press(Keycode.CONTROL,Keycode.P)
+            k.release_all()
+
+        elif _str == idControlB:
+            k.press(Keycode.CONTROL,Keycode.B)
+            k.release_all()
+
+        elif _str == idControlI:
+            k.press(Keycode.CONTROL,Keycode.I)
+            k.release_all() 
+        
+        elif _str == idControlD:
+            k.press(Keycode.CONTROL,Keycode.D)
+            k.release_all()
 
         elif _str == idUsLayout:
             kl = KeyboardLayoutUS(k)
