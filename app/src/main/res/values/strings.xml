@@ -7,5 +7,5 @@
     <string name="id_click_gauche">#$M01</string>
     <string name="id_click_droit">#$M02</string>
     <string name="id_mouse_move">#$M1</string>
-
+    <string name="id_mouse_scroll">#$M2</string>
 </resources>

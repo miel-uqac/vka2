@@ -346,58 +346,79 @@ fun TouchPad(
                     while (true) {
                         val event = awaitPointerEvent()
 
-                        event.changes.forEach { change ->
-                            var stopEvent = false
+                        //Détection de deux doigts  pour le scroll
+                        if (event.changes.size == 2) {
+                            val pointer1 = event.changes[0]
+                            val pointer2 = event.changes[1]
 
-                            // Détection du premier appui
-                            if (!isHold && change.pressed) {
-                                // Premier maintien détecté
-                                firstPosition = change.position
-                                lastPosition = change.position
-                                isHold = true
-                                firstHoldTime = change.uptimeMillis
-                            }
-                            // Détection du relâchement
-                            else if (isHold && !change.pressed) {
-                                val delta = firstPosition - lastPosition
-                                val deltaTime = abs(change.uptimeMillis - firstHoldTime)
+                            if (pointer1.pressed && pointer2.pressed) {
 
-                                if (delta.x.toInt() == 0 && delta.y.toInt() == 0 && deltaTime <500) {
-                                    // Clic simple : pas de déplacement détecté et click trop court pour être un maintient
-                                    sendData(context.getString(R.string.id_click_gauche))
-                                    stopEvent = true
-                                    isHold = false
+                                val offsetDelta = (pointer1.position.y + pointer2.position.y) / 2 -
+                                        (pointer1.previousPosition.y + pointer2.previousPosition.y) / 2
 
-                                } else if (abs(delta.x) <= deadZone && abs(delta.y) <= deadZone && !stopEvent) {
-                                    // Clic maintenu simulé pour un clic droit de souris
-                                    sendData(context.getString(R.string.id_click_droit))
-                                    stopEvent = true
-                                    isHold = false
-
-                                } else {
+                                if (abs(offsetDelta) > deadZone) { //Creer un autre deadZone ?
+                                    val scrollDirection = if (offsetDelta > 0) -1 else 1 //L'inverse suivant le sens de slide qu'on veut
+                                    val scrollCommand = context.getString(R.string.id_mouse_scroll) + ":H:$scrollDirection"
+                                    sendData(scrollCommand)
                                     isHold = false
                                 }
                             }
+                        } else {
+                            event.changes.forEach { change ->
+                                var stopEvent = false
 
-                            // Déplacement pendant le maintien (pavé tactile actif)
-                            if (isHold && change.pressed && !stopEvent) {
-                                val currentPosition = change.position
-                                val delta = currentPosition - lastPosition
+                                // Détection du premier appui
+                                if (!isHold && change.pressed) {
+                                    // Premier maintien détecté
+                                    firstPosition = change.position
+                                    lastPosition = change.position
+                                    isHold = true
+                                    firstHoldTime = change.uptimeMillis
+                                }
+                                // Détection du relâchement
+                                else if (isHold && !change.pressed) {
+                                    val delta = firstPosition - lastPosition
+                                    val deltaTime = abs(change.uptimeMillis - firstHoldTime)
 
-                                if (abs(delta.x) > deadZone || abs(delta.y) > deadZone) {
-                                    // Déplacement significatif détecté
-                                    val moveCommand = context.getString(R.string.id_mouse_move) +
-                                            ":${(sensibility*delta.x).toInt()}:${(sensibility*delta.y).toInt()}"
-                                    sendData(moveCommand)
+                                    if (delta.x.toInt() == 0 && delta.y.toInt() == 0 && deltaTime <500) {
+                                        // Clic simple : pas de déplacement détecté et click trop court pour être un maintient
+                                        sendData(context.getString(R.string.id_click_gauche))
+                                        stopEvent = true
+                                        isHold = false
+
+                                    } else if (abs(delta.x) <= deadZone && abs(delta.y) <= deadZone && !stopEvent) {
+                                        // Clic maintenu = clic droit de souris
+                                        sendData(context.getString(R.string.id_click_droit))
+                                        stopEvent = true
+                                        isHold = false
+
+                                    } else {
+                                        isHold = false
+                                    }
                                 }
 
-                                // Mettre à jour la dernière position pour le prochain déplacement
-                                lastPosition = currentPosition
-                            }
+                                // Déplacement pendant le maintien
+                                if (isHold && change.pressed && !stopEvent) {
+                                    val currentPosition = change.position
+                                    val delta = currentPosition - lastPosition
 
-                            // Consommer l'événement pour éviter qu'il ne soit traité plusieurs fois
-                            change.consume()
+                                    if (abs(delta.x) > deadZone || abs(delta.y) > deadZone) {
+                                        // Déplacement significatif
+                                        val moveCommand = context.getString(R.string.id_mouse_move) +
+                                                ":${(sensibility*delta.x).toInt()}:${(sensibility*delta.y).toInt()}"
+                                        sendData(moveCommand)
+                                    }
+
+                                    // Mettre à jour la dernière position pour le prochain déplacement
+                                    lastPosition = currentPosition
+                                }
+
+                                // Consommer l'événement pour éviter qu'il ne soit traité plusieurs fois
+                                change.consume()
+                            }
                         }
+
+
                     }
                 }
             }
