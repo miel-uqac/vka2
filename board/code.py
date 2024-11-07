@@ -64,7 +64,7 @@ idBackspace = r"\b"
 #---SOURIS---
 idMouseLeftClick = "#$M01"
 idMouseRightClick = "#$M02"
-idMouseMove = "#$M1" #Sera suivit de la distance
+idMouseMove = "#$M1" #Sera suivit de la distance sous forme : "#$M1:x:y"
 idMouseSlide = "#$M2" #Sera suivit de la direction (V = vertical ou H = horizontal) et de la distance 
 
 
@@ -91,17 +91,19 @@ def mouseAction(_str):
         m.click(Mouse.RIGHT_BUTTON)
         
     elif _str.startswith(idMouseMove):
-        deplacement = _str[len(idMouseMove):]
+        strTab = _str.split(":")
+        _x = strTab[1][:]
+        _y = strTab[2][:]
+        m.move(x=int(_x),y=int(_y))
 
-        
     elif _str.startswith(idMouseSlide):
-        deplacement = _str[len(idMouseSlide):]
-        
-        if(deplacement.startswith("H")):
-            deplacement = deplacement[1:]
-            m.move(wheel=int(deplacement))
+        strTab = _str.split(":")
+        _direction = strTab[1][:]
+        _wheel = strTab[2][:]
+        if _direction =="H":
+            m.move(wheel=int(_wheel))
 
-        #elif(deplacement.startswith("V")):salltest
+        #elif(deplacement.startswith("V")):
         
     else:
         return True
