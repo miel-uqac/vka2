@@ -1,9 +1,6 @@
 package com.example.klavier.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +36,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
@@ -50,14 +45,13 @@ import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.*
-import kotlinx.coroutines.launch
+import kotlin.math.abs
+
 
 @Composable
 fun MainScreen(
@@ -330,31 +324,84 @@ fun findFirstDifferenceIndex(str1: String, str2: String): Int {
 fun TouchPad(
     sendData: (String) -> Unit
 ) {
-    var lastPosition by remember { mutableStateOf(Offset.Zero) }
-    val scope = rememberCoroutineScope()
+
     val context = LocalContext.current
+
+    // PARAMETERS
+    val deadZone = 2
+    val sensibility = 1.2
 
     Box(
         modifier = Modifier
-            .fillMaxWidth() // Prend toute la largeur de l'écran
+            .fillMaxWidth()
             .fillMaxHeight(0.6f)
-            .background(Color.LightGray) //FOR DEBUG
+            .background(Color.LightGray) // FOR DEBUG
             .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        sendData(context.getString(R.string.id_click_gauche))
-                    },
-                    onDoubleTap = { offset ->
-                        sendData(context.getString(R.string.id_click_gauche))
-                        sendData(context.getString(R.string.id_click_gauche))
-                    },
-                    onLongPress = { offset ->
-                        sendData(context.getString(R.string.id_click_droit))
-                    },
-                    onPress = { offset ->
-                        //TODO Utiliser ça pour glisser ou pas ?
+                awaitPointerEventScope {
+                    var isHold = false
+                    var firstPosition = Offset.Zero
+                    var lastPosition = Offset.Zero
+                    var firstHoldTime = 0L
+
+                    while (true) {
+                        val event = awaitPointerEvent()
+
+                        event.changes.forEach { change ->
+                            var stopEvent = false
+
+                            // Détection du premier appui
+                            if (!isHold && change.pressed) {
+                                // Premier maintien détecté
+                                firstPosition = change.position
+                                lastPosition = change.position
+                                isHold = true
+                                firstHoldTime = change.uptimeMillis
+                            }
+                            // Détection du relâchement
+                            else if (isHold && !change.pressed) {
+                                val delta = firstPosition - lastPosition
+                                val deltaTime = abs(change.uptimeMillis - firstHoldTime)
+
+                                if (delta.x.toInt() == 0 && delta.y.toInt() == 0 && deltaTime <500) {
+                                    // Clic simple : pas de déplacement détecté et click trop court pour être un maintient
+                                    sendData(context.getString(R.string.id_click_gauche))
+                                    stopEvent = true
+                                    isHold = false
+
+                                } else if (abs(delta.x) <= deadZone && abs(delta.y) <= deadZone && !stopEvent) {
+                                    // Clic maintenu simulé pour un clic droit de souris
+                                    sendData(context.getString(R.string.id_click_droit))
+                                    stopEvent = true
+                                    isHold = false
+
+                                } else {
+                                    isHold = false
+                                }
+                            }
+
+                            // Déplacement pendant le maintien (pavé tactile actif)
+                            if (isHold && change.pressed && !stopEvent) {
+                                val currentPosition = change.position
+                                val delta = currentPosition - lastPosition
+
+                                if (abs(delta.x) > deadZone || abs(delta.y) > deadZone) {
+                                    // Déplacement significatif détecté
+                                    val moveCommand = context.getString(R.string.id_mouse_move) +
+                                            ":${(sensibility*delta.x).toInt()}:${(sensibility*delta.y).toInt()}"
+                                    sendData(moveCommand)
+                                }
+
+                                // Mettre à jour la dernière position pour le prochain déplacement
+                                lastPosition = currentPosition
+                            }
+
+                            // Consommer l'événement pour éviter qu'il ne soit traité plusieurs fois
+                            change.consume()
+                        }
                     }
-                )
+                }
             }
     )
+
+
 }

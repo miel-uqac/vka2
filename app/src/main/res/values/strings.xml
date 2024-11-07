@@ -6,4 +6,6 @@
     <string name="id_paste">#$002</string>
     <string name="id_click_gauche">#$M01</string>
     <string name="id_click_droit">#$M02</string>
+    <string name="id_mouse_move">#$M1</string>
+
 </resources>
