@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
         usbController = USBController(usbManager = getSystemService(Context.USB_SERVICE) as UsbManager)
         viewModel = USBViewModel(usbController,this)
-        SettingViewModel = SettingModelView(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB)
+        SettingViewModel = SettingModelView(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB,this)
 
 
         super.onCreate(savedInstanceState)
