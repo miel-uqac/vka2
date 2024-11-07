@@ -1,25 +1,42 @@
 package com.example.klavier.ui
 
-import androidx.compose.foundation.layout.Arrangement
+
+
+import android.content.Context
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +52,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
@@ -44,18 +60,21 @@ import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.*
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 
 @Composable
 fun MainScreen(
     sendData: (String) -> Unit,
-    onSettingsButtonClicked : () -> Unit = {}
+    onSettingsButtonClicked : () -> Unit = {},
+    macroLabels: ArrayList<String>,
+    macroIcons: ArrayList<Int>,
+    macroFunctions: ArrayList<() -> Unit>
 )
 {
     var tabIndex by remember { mutableIntStateOf(0) }
@@ -67,15 +86,15 @@ fun MainScreen(
         ){
             Text(
                 "Klavier",
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
+                modifier = Modifier.align(Alignment.CenterVertically))
+
             IconButton(
                 onClick = onSettingsButtonClicked,
+                modifier = Modifier.align(Alignment.CenterVertically)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
-                    contentDescription = "Settings"
-                )
+                    contentDescription = "Settings")
             }
         }
         TabRow(
@@ -87,9 +106,9 @@ fun MainScreen(
                 )
             }
         }
-        Row (modifier  = Modifier.fillMaxSize(1f)) {
+        Row (modifier  = Modifier.fillMaxWidth(1f)) {
             when (tabIndex) {
-                0 -> MacrosTab(sendData = sendData)
+                0 -> MacrosTab(sendData = sendData, macroLabels, macroIcons, macroFunctions)
                 1 -> ColorPickerTab(sendData = sendData)
             }
 
@@ -103,30 +122,60 @@ fun MainScreen(
 
 @Composable
 fun MacrosTab(
-    sendData: (String) -> Unit
+    sendData: (String) -> Unit,
+    macroLabels: ArrayList<String>,
+    macroIcons: ArrayList<Int>,
+    macroFunctions: ArrayList<() -> Unit>
 )
 {
     val context = LocalContext.current
     Column{
-        Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
-            IconButton(
-                onClick = {
-                    sendData(context.getString(R.string.id_copy))
-                },
-                modifier = Modifier,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.copy_icon), contentDescription = "copier"
+        LazyRow(
+            modifier = Modifier
+                .height(50.dp)
+        ) {
+            // macro copier
+            item{
+                GridItem(
+                    onClick = {
+                        sendData(context.getString(R.string.id_copy))
+                    },
+                    painter = R.drawable.copy_icon,
+                    contentDescription = "copier"
                 )
+            }
+            // macro coller
+            item{
+                GridItem(
+                    onClick = {
+                        sendData(context.getString(R.string.id_paste))
+                    },
+                    painter = R.drawable.paste_icon,
+                    contentDescription = "coller"
+                )
+            }
+            items(macroLabels) {arrayItem ->
+                GridItem(
+                    onClick = macroFunctions[macroLabels.indexOf(arrayItem)],
+                    painter = macroIcons[macroLabels.indexOf(arrayItem)],
+                    contentDescription = arrayItem
+                )
+            }
+        }
+        Row(modifier = Modifier.align(Alignment.Start))
+        {
+            var showDialog by remember { mutableStateOf(false) }
+            if (showDialog) {
+                AddMacrosDialog(onDismissRequest = { showDialog = false }, onConfirmation = { showDialog = false }, context, sendData, macroLabels, macroIcons, macroFunctions)
             }
             IconButton(
                 onClick = {
-                    sendData(context.getString(R.string.id_paste))
+                    showDialog = true
                 },
                 modifier = Modifier,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.paste_icon), contentDescription = "coller"
+                    painter = painterResource(R.drawable.add_icon), contentDescription = "ajouter une macro"
                 )
             }
         }
@@ -235,7 +284,6 @@ fun ColorPickerTab(
 
         }
     }
-
 }
 
 
@@ -308,4 +356,156 @@ fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
 
 fun findFirstDifferenceIndex(str1: String, str2: String): Int {
     return str1.zip(str2).indexOfFirst { (char1, char2) -> char1 != char2 }
+}
+
+@Composable
+fun AddMacrosDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    context : Context,
+    sendData: (String) -> Unit,
+    macroLabels : ArrayList<String>,
+    macroIcons : ArrayList<Int>,
+    macroFunctions : ArrayList<() -> Unit>
+)
+{
+    Dialog(onDismissRequest = { onDismissRequest() })
+    {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(375.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        )
+        {
+            Column (modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxHeight()
+                .padding(top = 20.dp, bottom = 20.dp)
+            ){
+                Text(
+                    text = "Selectionnez les macros à ajouter.",
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 10.dp)
+                )
+
+                OutlinedCard(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .size(width = 240.dp, height = 200.dp)
+                )
+                {
+                    Column(modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .verticalScroll(rememberScrollState())
+                    ){
+                        MacroChip(
+                            "couper", R.drawable.cut_icon, {sendData(context.getString(R.string.id_cut))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "tout selectionner", R.drawable.select_all_icon, {sendData(context.getString(R.string.id_select_all))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "undo", R.drawable.undo_icon, {sendData(context.getString(R.string.id_undo))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "redo", R.drawable.redo_icon, {sendData(context.getString(R.string.id_redo))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "chercher", R.drawable.find_icon, {sendData(context.getString(R.string.id_search))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "chercher et remplacer", R.drawable.find_replace_icon, {sendData(context.getString(R.string.id_search_replace))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "imprimer", R.drawable.print_icon, {sendData(context.getString(R.string.id_print))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "gras", R.drawable.bold_icon, {sendData(context.getString(R.string.id_gras))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "italique", R.drawable.italic_icon, {sendData(context.getString(R.string.id_italique))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        MacroChip(
+                            "souligner", R.drawable.underline_icon, {sendData(context.getString(R.string.id_souligne))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+
+                Row(modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                ){
+                    TextButton(
+                        onClick = { onConfirmation() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Ajouter")
+                    }
+                    TextButton(
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Annuler")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MacroChip(
+    label: String,
+    @DrawableRes iconResource: Int,
+    onClick: () -> Unit,
+    macroLabels : ArrayList<String>,
+    macroIcons : ArrayList<Int>,
+    macroFunctions : ArrayList<() -> Unit>,
+    modifier: Modifier
+) {
+    var selected by remember { mutableStateOf(false) }
+
+    FilterChip(
+        onClick = {
+            selected = !selected
+            if (selected) {
+                if (!macroLabels.contains(label)) {
+                    macroLabels.add(label)
+                    macroIcons.add(iconResource)
+                    macroFunctions.add(onClick)
+                }
+            }
+            else {
+                macroLabels.remove(label)
+                macroIcons.remove(iconResource)
+                macroFunctions.remove(onClick)
+            }
+        },
+        label = {
+            Icon(painter = painterResource(iconResource), contentDescription = label)
+            Text(label)
+        },
+        selected = selected,
+    )
+}
+
+@Composable
+fun GridItem(
+    onClick: () -> Unit,
+    painter: Int,
+    contentDescription: String
+)
+{
+    IconButton(
+        onClick = onClick,
+    ) {
+        Icon(
+            painter = painterResource(painter),
+            contentDescription = contentDescription
+        )
+    }
 }
