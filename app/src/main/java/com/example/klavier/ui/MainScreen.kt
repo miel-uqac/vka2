@@ -476,6 +476,14 @@ fun AddMacrosDialog(
     macroFunctions : ArrayList<() -> Unit>
 )
 {
+    var tempMacroLabels by remember { mutableStateOf(ArrayList<String>()) }
+    var tempMacroIcons by remember { mutableStateOf(ArrayList<Int>()) }
+    var tempMacroFunctions by remember { mutableStateOf(ArrayList<() -> Unit>()) }
+
+    tempMacroLabels.addAll(macroLabels)
+    tempMacroIcons.addAll(macroIcons)
+    tempMacroFunctions.addAll(macroFunctions)
+
     Dialog(onDismissRequest = { onDismissRequest() })
     {
         Card(
@@ -511,34 +519,34 @@ fun AddMacrosDialog(
                         .verticalScroll(rememberScrollState())
                     ){
                         MacroChip(
-                            "couper", R.drawable.cut_icon, {sendData(context.getString(R.string.id_cut))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "couper", R.drawable.cut_icon, {sendData(context.getString(R.string.id_cut))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "tout selectionner", R.drawable.select_all_icon, {sendData(context.getString(R.string.id_select_all))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "tout selectionner", R.drawable.select_all_icon, {sendData(context.getString(R.string.id_select_all))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "undo", R.drawable.undo_icon, {sendData(context.getString(R.string.id_undo))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "undo", R.drawable.undo_icon, {sendData(context.getString(R.string.id_undo))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "redo", R.drawable.redo_icon, {sendData(context.getString(R.string.id_redo))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "redo", R.drawable.redo_icon, {sendData(context.getString(R.string.id_redo))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "chercher", R.drawable.find_icon, {sendData(context.getString(R.string.id_search))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "chercher", R.drawable.find_icon, {sendData(context.getString(R.string.id_search))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "chercher et remplacer", R.drawable.find_replace_icon, {sendData(context.getString(R.string.id_search_replace))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "chercher et remplacer", R.drawable.find_replace_icon, {sendData(context.getString(R.string.id_search_replace))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "imprimer", R.drawable.print_icon, {sendData(context.getString(R.string.id_print))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "imprimer", R.drawable.print_icon, {sendData(context.getString(R.string.id_print))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "gras", R.drawable.bold_icon, {sendData(context.getString(R.string.id_gras))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "gras", R.drawable.bold_icon, {sendData(context.getString(R.string.id_gras))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "italique", R.drawable.italic_icon, {sendData(context.getString(R.string.id_italique))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "italique", R.drawable.italic_icon, {sendData(context.getString(R.string.id_italique))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                         MacroChip(
-                            "souligner", R.drawable.underline_icon, {sendData(context.getString(R.string.id_souligne))}, macroLabels, macroIcons, macroFunctions, Modifier.align(Alignment.CenterHorizontally)
+                            "souligner", R.drawable.underline_icon, {sendData(context.getString(R.string.id_souligne))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }
@@ -547,13 +555,29 @@ fun AddMacrosDialog(
                     .align(Alignment.CenterHorizontally)
                 ){
                     TextButton(
-                        onClick = { onConfirmation() },
+                        onClick = {
+                            macroLabels.clear()
+                            macroIcons.clear()
+                            macroFunctions.clear()
+
+                            macroLabels.addAll(tempMacroLabels)
+                            macroIcons.addAll(tempMacroIcons)
+                            macroFunctions.addAll(tempMacroFunctions)
+
+                            onConfirmation()
+                        },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Ajouter")
                     }
                     TextButton(
-                        onClick = { onDismissRequest() },
+                        onClick = {
+                            tempMacroLabels.clear()
+                            tempMacroIcons.clear()
+                            tempMacroFunctions.clear()
+
+                            onDismissRequest()
+                        },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Annuler")
