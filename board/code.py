@@ -78,7 +78,7 @@ idFrLayout = "#$L1"
 idMouseLeftClick = "#$M01"
 idMouseRightClick = "#$M02"
 idMouseMove = "#$M1" #Sera suivit de la distance sous forme : "#$M1:x:y"
-idMouseSlide = "#$M2" #Sera suivit de la direction (V = vertical ou H = horizontal) et de la distance 
+idMouseSlide = "#$M2" #Sera suivit de la direction (V = vertical ou H = horizontal) et de la direction "#$M2V-1"
 
 
 def macroAction(_str):
@@ -171,14 +171,14 @@ def mouseAction(_str):
   
 def layoutAction(_str):
     if _str == idUsLayout:
-         kl = KeyboardLayoutUS(k)
-         layout = "US"
+        kl = KeyboardLayoutUS(k)
+        layout = "US"
 
     elif _str == idFrLayout:
-         kl = KeyboardLayoutFR(k)
-         layout = "FR"
+        kl = KeyboardLayoutFR(k)
+        layout = "FR"
     else:
-         return True
+        return True
 
     return False
   
@@ -192,7 +192,7 @@ while True:
         pass
 
     while ble.connected:
-        _str = input() # read serial communication (type and press ENTER or RETURN)
+        _str = input() # read serial communication
         
         envoie = True #permet l'envoie du str brut 
     

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,9 +24,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -66,8 +63,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.skydoves.colorpicker.compose.*
 import kotlin.math.abs
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
@@ -111,7 +106,13 @@ fun MainScreen(
         Column (modifier  = Modifier.fillMaxSize(1f)) {
             when (tabIndex) {
                 0 -> {
-                    MacrosTab(sendData = sendData)
+                    MacrosTab(
+                        sendData = sendData,
+                        macroFunctions = macroFunctions,
+                        macroIcons = macroIcons,
+                        macroLabels = macroLabels
+
+                    )
                     TouchPad(sendData = sendData)
                 }
                 1 -> ColorPickerTab(sendData = sendData)
@@ -120,18 +121,9 @@ fun MainScreen(
         }
         Row (modifier = Modifier.align(Alignment.CenterHorizontally)
         ){
-            keyboardInput(sendData)
+            KeyboardInput(sendData)
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    MainScreen(
-        sendData = { /* Action de test pour sendData */ },
-        onSettingsButtonClicked = { /* Action de test pour le bouton paramètres */ }
-    )
 }
 
 @Composable
@@ -296,7 +288,7 @@ fun ColorPickerTab(
 
 
 @Composable
-fun keyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
+fun KeyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
     var input by remember { mutableStateOf("") }
     val backspaceKeyCode = Key.Backspace.nativeKeyCode
     val backspace: String = """\b"""
@@ -473,6 +465,7 @@ fun TouchPad(
 
 }
 
+@Composable
 fun AddMacrosDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
