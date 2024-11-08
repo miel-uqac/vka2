@@ -2,6 +2,7 @@
     <string name="app_name">Klavier</string>
     <string name="splash_screen">Splash Screen</string>
     <string name="settings">Settings</string>
+  
     <string name="id_copy">#$001</string>
     <string name="id_paste">#$002</string>
     <string name='id_cut'>#$003</string>
@@ -14,5 +15,12 @@
     <string name='id_gras'>#$010</string>
     <string name='id_souligne'>#$011</string>
     <string name='id_italique'>#$012</string>
+  
     <string name="id_layout">#$L</string>
+
+    <string name="id_click_gauche">#$M01</string>
+    <string name="id_click_droit">#$M02</string>
+    <string name="id_mouse_move">#$M1</string>
+    <string name="id_mouse_scroll">#$M2</string>
+
 </resources>

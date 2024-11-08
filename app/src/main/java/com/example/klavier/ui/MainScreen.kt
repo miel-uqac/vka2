@@ -1,7 +1,6 @@
 package com.example.klavier.ui
 
 
-
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -51,10 +50,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
@@ -64,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.skydoves.colorpicker.compose.*
+import kotlin.math.abs
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -106,9 +108,12 @@ fun MainScreen(
                 )
             }
         }
-        Row (modifier  = Modifier.fillMaxWidth(1f)) {
+        Column (modifier  = Modifier.fillMaxSize(1f)) {
             when (tabIndex) {
-                0 -> MacrosTab(sendData = sendData, macroLabels, macroIcons, macroFunctions)
+                0 -> {
+                    MacrosTab(sendData = sendData)
+                    TouchPad(sendData = sendData)
+                }
                 1 -> ColorPickerTab(sendData = sendData)
             }
 
@@ -118,6 +123,15 @@ fun MainScreen(
             keyboardInput(sendData)
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    MainScreen(
+        sendData = { /* Action de test pour sendData */ },
+        onSettingsButtonClicked = { /* Action de test pour le bouton paramètres */ }
+    )
 }
 
 @Composable
@@ -190,17 +204,12 @@ fun ColorPickerTab(
     val controller = rememberColorPickerController()
     var hexCode by remember { mutableStateOf("") }
     var textColor by remember { mutableStateOf(Color.Transparent) }
-    Row(
-        //modifier = Modifier.fillMaxSize(),
-        //horizontalArrangement = Arrangement.SpaceEvenly // Répartit l'espace de manière équilibrée
-    ) {
+    Row() {
         Column(
             modifier = Modifier
                 .weight(0.8f),
-                //.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Premier élément
             Box(
                 modifier = Modifier
                     .padding(10.dp)
@@ -242,7 +251,6 @@ fun ColorPickerTab(
                     .fillMaxWidth()
                     .padding(10.dp)
                     .height(35.dp),
-                    //.align(Alignment.CenterHorizontally),
                 controller = controller,
             )
         }
@@ -359,6 +367,112 @@ fun findFirstDifferenceIndex(str1: String, str2: String): Int {
 }
 
 @Composable
+fun TouchPad(
+    sendData: (String) -> Unit
+) {
+
+    val context = LocalContext.current
+
+    // PARAMETERS
+    val deadZone = 2
+    val sensibility = 1.2
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.6f)
+            .background(Color.LightGray) // FOR DEBUG
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    var isHold = false
+                    var firstPosition = Offset.Zero
+                    var lastPosition = Offset.Zero
+                    var firstHoldTime = 0L
+
+                    while (true) {
+                        val event = awaitPointerEvent()
+
+                        //Détection de deux doigts  pour le scroll
+                        if (event.changes.size == 2) {
+                            val pointer1 = event.changes[0]
+                            val pointer2 = event.changes[1]
+
+                            if (pointer1.pressed && pointer2.pressed) {
+
+                                val offsetDelta = (pointer1.position.y + pointer2.position.y) / 2 -
+                                        (pointer1.previousPosition.y + pointer2.previousPosition.y) / 2
+
+                                if (abs(offsetDelta) > deadZone) { //Creer un autre deadZone ?
+                                    val scrollDirection = if (offsetDelta > 0) -1 else 1 //L'inverse suivant le sens de slide qu'on veut
+                                    val scrollCommand = context.getString(R.string.id_mouse_scroll) + ":H:$scrollDirection"
+                                    sendData(scrollCommand)
+                                    isHold = false
+                                }
+                            }
+                        } else {
+                            event.changes.forEach { change ->
+                                var stopEvent = false
+
+                                // Détection du premier appui
+                                if (!isHold && change.pressed) {
+                                    // Premier maintien détecté
+                                    firstPosition = change.position
+                                    lastPosition = change.position
+                                    isHold = true
+                                    firstHoldTime = change.uptimeMillis
+                                }
+                                // Détection du relâchement
+                                else if (isHold && !change.pressed) {
+                                    val delta = firstPosition - lastPosition
+                                    val deltaTime = abs(change.uptimeMillis - firstHoldTime)
+
+                                    if (delta.x.toInt() == 0 && delta.y.toInt() == 0 && deltaTime <500) {
+                                        // Clic simple : pas de déplacement détecté et click trop court pour être un maintient
+                                        sendData(context.getString(R.string.id_click_gauche))
+                                        stopEvent = true
+                                        isHold = false
+
+                                    } else if (abs(delta.x) <= deadZone && abs(delta.y) <= deadZone && !stopEvent) {
+                                        // Clic maintenu = clic droit de souris
+                                        sendData(context.getString(R.string.id_click_droit))
+                                        stopEvent = true
+                                        isHold = false
+
+                                    } else {
+                                        isHold = false
+                                    }
+                                }
+
+                                // Déplacement pendant le maintien
+                                if (isHold && change.pressed && !stopEvent) {
+                                    val currentPosition = change.position
+                                    val delta = currentPosition - lastPosition
+
+                                    if (abs(delta.x) > deadZone || abs(delta.y) > deadZone) {
+                                        // Déplacement significatif
+                                        val moveCommand = context.getString(R.string.id_mouse_move) +
+                                                ":${(sensibility*delta.x).toInt()}:${(sensibility*delta.y).toInt()}"
+                                        sendData(moveCommand)
+                                    }
+
+                                    // Mettre à jour la dernière position pour le prochain déplacement
+                                    lastPosition = currentPosition
+                                }
+
+                                // Consommer l'événement pour éviter qu'il ne soit traité plusieurs fois
+                                change.consume()
+                            }
+                        }
+
+
+                    }
+                }
+            }
+    )
+
+
+}
+
 fun AddMacrosDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
