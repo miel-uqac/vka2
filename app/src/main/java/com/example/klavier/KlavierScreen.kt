@@ -14,13 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.asLiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.klavier.data.Layout
 import com.example.klavier.ui.MainScreen
 import com.example.klavier.ui.SettingsScreen
 import com.example.klavier.ui.SplashScreen
@@ -58,16 +63,24 @@ fun KlavierAppBar(
 @Composable
 fun KlavierApp(
     viewModel: USBViewModel,
+    SettingViewModel: SettingModelView,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    isDarkTheme: Boolean,
 
     ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val connected by viewModel.isConnected.observeAsState(false)
     val hasPermission by viewModel.hasPermission.observeAsState(false)
+    val currentLayout = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.layout ?: Layout.FR
     val currentScreen = KlavierScreen.valueOf(
         backStackEntry?.destination?.route ?: KlavierScreen.Start.name
     )
+
+    var macroLabels by remember { mutableStateOf(ArrayList<String>()) }
+    var macroIcons by remember { mutableStateOf(ArrayList<Int>()) }
+    var macroFunctions by remember { mutableStateOf(ArrayList<() -> Unit>()) }
+
     Scaffold(
        /* topBar = {
             KlavierAppBar(
@@ -86,17 +99,25 @@ fun KlavierApp(
                 SplashScreen(
                     connected = connected,
                     hasPermission = hasPermission,
-                    onGranted = { navController.navigate(route = KlavierScreen.Main.name) }
+                    onGranted = { navController.navigate(route = KlavierScreen.Main.name) },
+                    askPermission = viewModel::askPermission
                 )
             }
             composable(route = KlavierScreen.Main.name) {
                 MainScreen(
                     sendData = viewModel::writeUSB,
-                    onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) }
+                    onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) },
+                    macroLabels,
+                    macroIcons,
+                    macroFunctions
                 )
             }
             composable(route = KlavierScreen.Settings.name) {
                 SettingsScreen(
+                    ChangeTheme = SettingViewModel::updateDarkTheme,
+                    isDarkTheme = isDarkTheme,
+                    SetLayout = SettingViewModel::updateLayout,
+                    actualLayout = currentLayout,
                     onBackButtonClicked = { navController.navigate(route = KlavierScreen.Main.name) }
                 )
             }

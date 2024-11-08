@@ -39,6 +39,7 @@ else:
 k = Keyboard(hid.devices)
 kl = KeyboardLayoutFR(k)
 m = Mouse(hid.devices)
+layout = "FR"
 
 """
 LED configuration (just) for debug/test
@@ -57,9 +58,21 @@ led_blue.direction = digitalio.Direction.OUTPUT
 #---MACROS---
 idControlC = "#$001"
 idControlV = "#$002"
+idControlX = "#$003"
+idControlA = "#$004"
+idControlZ = "#$005"
+idControlY = "#$006"
+idControlF = "#$007"
+idControlH = "#$008"
+idControlP = "#$009"
+idControlB = "#$010"
+idControlI = "#$011"
+idControlD = "#$012"
 
 #---CLAVIER---
 idBackspace = r"\b"
+idUsLayout = "#$L0"
+idFrLayout = "#$L1"
 
 #---SOURIS---
 idMouseLeftClick = "#$M01"
@@ -77,6 +90,52 @@ def macroAction(_str):
         k.press(Keycode.CONTROL, Keycode.V)
         k.release_all()
 
+    elif _str == idControlX:
+            k.press(Keycode.CONTROL,Keycode.X)
+            k.release_all()
+        
+    elif _str == idControlA:
+        if(layout == "US"):
+            k.press(Keycode.CONTROL,Keycode.A)
+        else:
+            k.press(Keycode.CONTROL,Keycode.Q)
+        k.release_all()
+
+    elif _str == idControlZ:
+        if(layout == "US"):
+            k.press(Keycode.CONTROL,Keycode.Z)
+        else:
+            k.press(Keycode.CONTROL,Keycode.W)
+        k.release_all()
+
+    elif _str == idControlY:
+        k.press(Keycode.CONTROL,Keycode.Y)
+        k.release_all()
+
+    elif _str == idControlF:
+        k.press(Keycode.CONTROL,Keycode.F)
+        k.release_all()
+
+    elif _str == idControlH:
+        k.press(Keycode.CONTROL,Keycode.H)
+        k.release_all()
+
+    elif _str == idControlP:
+        k.press(Keycode.CONTROL,Keycode.P)
+        k.release_all()
+
+    elif _str == idControlB:
+        k.press(Keycode.CONTROL,Keycode.B)
+        k.release_all()
+
+    elif _str == idControlI:
+        k.press(Keycode.CONTROL,Keycode.I)
+        k.release_all() 
+
+    elif _str == idControlD:
+        k.press(Keycode.CONTROL,Keycode.D)
+        k.release_all()
+        
     else:
         return True
 
@@ -109,7 +168,20 @@ def mouseAction(_str):
         return True
 
     return False
+  
+def layoutAction(_str):
+    if _str == idUsLayout:
+         kl = KeyboardLayoutUS(k)
+         layout = "US"
 
+    elif _str == idFrLayout:
+         kl = KeyboardLayoutFR(k)
+         layout = "FR"
+    else:
+         return True
+
+    return False
+  
 
 """
 Main loop
@@ -133,8 +205,12 @@ while True:
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
             envoie = False
+            
+        elif _str.startswith("#$L"):
+            envoie = layoutAction(_str)
         
         if envoie:
             kl.write(_str)
+            
 
     ble.start_advertising(advertisement)
