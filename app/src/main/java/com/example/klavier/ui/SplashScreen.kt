@@ -3,6 +3,7 @@ package com.example.klavier.ui
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import com.example.klavier.R
 import kotlin.reflect.KFunction1
 import androidx.compose.ui.platform.LocalContext
 import com.example.klavier.ui.theme.DarkerBlue
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun SplashScreen(
@@ -61,6 +63,7 @@ fun SplashScreen(
                             modifier = Modifier
                                 .height(100.dp)
                                 .width(320.dp)
+                                .background(Color(0xFF98C3D9))
                             ){
                         Text(
                             text=value,
@@ -76,7 +79,6 @@ fun SplashScreen(
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-
                 }
     }
     LaunchedEffect(hasPermission) {
@@ -84,11 +86,4 @@ fun SplashScreen(
             onGranted()
         }
     }
-}
-
-@Composable
-@Preview
-fun splashScreenPreview()
-{
-    SplashScreen(false, false, {}, Modifier)
 }
