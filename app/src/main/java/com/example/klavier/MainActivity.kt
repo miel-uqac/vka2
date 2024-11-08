@@ -26,9 +26,9 @@ import com.example.klavier.ui.theme.KlavierTheme
 
 class MainActivity : ComponentActivity() {
 
-    lateinit var usbController : USBController
+    private lateinit var usbController : USBController
     lateinit var viewModel : USBViewModel
-    lateinit var SettingViewModel : SettingModelView
+    private lateinit var SettingViewModel : SettingModelView
 
 
 

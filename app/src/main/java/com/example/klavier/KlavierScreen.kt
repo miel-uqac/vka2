@@ -99,7 +99,8 @@ fun KlavierApp(
                 SplashScreen(
                     connected = connected,
                     hasPermission = hasPermission,
-                    onGranted = { navController.navigate(route = KlavierScreen.Main.name) }
+                    onGranted = { navController.navigate(route = KlavierScreen.Main.name) },
+                    askPermission = viewModel::askPermission
                 )
             }
             composable(route = KlavierScreen.Main.name) {
