@@ -37,6 +37,7 @@ else:
 
 k = Keyboard(hid.devices)
 kl = KeyboardLayoutFR(k)
+layout = "FR"
 
 """
 LED configuration (just) for debug/test
@@ -112,11 +113,17 @@ while True:
             k.release_all()
         
         elif _str == idControlA:
-            k.press(Keycode.CONTROL,Keycode.A)
+            if(layout == "US"):
+                k.press(Keycode.CONTROL,Keycode.A)
+            else:
+                k.press(Keycode.CONTROL,Keycode.Q)
             k.release_all()
 
         elif _str == idControlZ:
-            k.press(Keycode.CONTROL,Keycode.Z)
+            if(layout == "US"):
+                k.press(Keycode.CONTROL,Keycode.Z)
+            else:
+                k.press(Keycode.CONTROL,Keycode.W)
             k.release_all()
         
         elif _str == idControlY:
@@ -149,11 +156,14 @@ while True:
 
         elif _str == idUsLayout:
             kl = KeyboardLayoutUS(k)
+            layout = "US"
 
         elif _str == idFrLayout:
             kl = KeyboardLayoutFR(k)
+            layout = "FR"
             
         else:
             kl.write(_str)
+            
 
     ble.start_advertising(advertisement)

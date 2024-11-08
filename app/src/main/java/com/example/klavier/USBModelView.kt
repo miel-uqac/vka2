@@ -39,11 +39,15 @@ class USBViewModel(private val usbController: USBController,context: Context) : 
         usbController.USBWrite(data)
     }
 
-    fun checkConnected() {
+    fun askPermission(context: Context){
+        usbController.askPermission(context)
+    }
+
+    private fun checkConnected() {
         _isConnected.value = usbController.USBConnected
     }
 
-    fun checkUSBPermission() {
+    private fun checkUSBPermission() {
         _hasPermission.value = usbController.hasDevicePermission
     }
 

@@ -35,17 +35,6 @@ class USBController(private val usbManager: UsbManager) {
         if (m_driver != null) {
             m_device = m_driver!!.device
             Log.i("USB", "USB device name: " + m_device!!.deviceName)
-
-            val flags =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_MUTABLE else 0
-            val intent: PendingIntent = if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (U) */) {
-                val intent =  Intent(ACTION_USB_PERMISSION)
-                intent.setPackage(context.packageName)
-                PendingIntent.getBroadcast(context, 0, intent, flags)
-            }
-            else{
-                PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
-            }
             hasDevicePermission = usbManager.hasPermission(m_driver!!.device)
             if (hasDevicePermission) {
                 // Permission already granted, no need to request
@@ -53,7 +42,7 @@ class USBController(private val usbManager: UsbManager) {
                 Log.i("USB", "USB permission not requested")
             } else {
                 // Request permission
-                usbManager.requestPermission(m_driver!!.device, intent)
+                askPermission(context)
                 Log.i("USB", "USB permission requested")
             }
 
@@ -67,6 +56,20 @@ class USBController(private val usbManager: UsbManager) {
 
     fun USBRead() {
         //TODO
+    }
+
+    fun askPermission(context: Context){
+        val flags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_MUTABLE else 0
+        val intent: PendingIntent = if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (U) */) {
+            val intent =  Intent(ACTION_USB_PERMISSION)
+            intent.setPackage(context.packageName)
+            PendingIntent.getBroadcast(context, 0, intent, flags)
+        }
+        else{
+            PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
+        }
+        usbManager.requestPermission(m_driver!!.device, intent)
     }
 
     fun connectToDevice(){
