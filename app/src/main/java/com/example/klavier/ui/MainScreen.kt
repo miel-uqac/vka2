@@ -4,6 +4,7 @@ package com.example.klavier.ui
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -107,7 +108,7 @@ fun MainScreen(
             color = Color.Gray // Couleur de la ligne
         )
         TabRow(
-            selectedTabIndex = tabIndex) {
+            selectedTabIndex = tabIndex, containerColor = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onPrimary) {
             tabs.forEachIndexed { index, title ->
                 Tab(text = { Text(title) },
                     selected = tabIndex == index,
@@ -385,8 +386,9 @@ fun TouchPad(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .border(1.dp, Color.DarkGray)
             .fillMaxHeight(0.6f)
-            .background(Color.LightGray) // FOR DEBUG
+            .background(Color.LightGray.copy(0.6f)) // FOR DEBUG
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     var isHold = false

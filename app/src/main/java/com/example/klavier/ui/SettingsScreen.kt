@@ -22,6 +22,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,7 +62,7 @@ fun SettingsScreen(
     )
     {
         Row(
-            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),horizontalArrangement = Arrangement.Center
+            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().padding(16.dp),horizontalArrangement = Arrangement.Center
         ){
             IconButton(onClick = onBackButtonClicked) {
                 Icon(
@@ -79,11 +80,20 @@ fun SettingsScreen(
                 )
 
         }
-        Divider(
-            color = Color.Gray, // Couleur de la ligne
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp), // Espace autour du Divider
             thickness = 1.dp, // Épaisseur de la ligne
-            modifier = Modifier.padding(vertical = 8.dp) // Espace autour du Divider
+            color = Color.Gray // Couleur de la ligne
         )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+            Text(
+                text = "Paramètres"
+                ,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 10.dp).align(Alignment.CenterVertically)
+            )
+        }
         Row(modifier = Modifier.fillMaxWidth()
             .weight(1f)
             .padding(16.dp),
@@ -131,16 +141,9 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Paramètres"
-            ,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 20.dp)
-                .align(Alignment.CenterHorizontally)
-        )
         Text(
             text = "Choissisez le clavier que votre ordinateur utilise:",
             style = MaterialTheme.typography.bodyMedium,
@@ -151,15 +154,15 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
         // Main dropdown button with centered text and arrow
         Box(
             Modifier
-                .fillMaxWidth()
                 .clickable { isDropDownExpanded.value = true }
                 .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(8.dp))
                 .padding(horizontal = 16.dp, vertical = 12.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 Text(
                     text = "Layout: $layout",
@@ -173,33 +176,35 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-        }
+            // Dropdown menu positioned directly below the dropdown button
+            DropdownMenu(
+                expanded = isDropDownExpanded.value,
+                onDismissRequest = { isDropDownExpanded.value = false },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp) // Full width for centered items
+            ) {
+                layoutOptions.forEach { option ->
+                    DropdownMenuItem(
+                        modifier = Modifier.padding(1.dp), // Full width for alignment
+                        text = {
+                            Text(
+                                text = option.toString(),
+                                modifier = Modifier.fillMaxWidth(), // Full width to ensure centering
+                                textAlign = TextAlign.Center, // Center the text within the item
+                                style = MaterialTheme.typography.bodyMedium
 
-        // Dropdown menu positioned directly below the dropdown button
-        DropdownMenu(
-            expanded = isDropDownExpanded.value,
-            onDismissRequest = { isDropDownExpanded.value = false },
-            modifier = Modifier
-                .fillMaxWidth().padding(16.dp) // Full width for centered items
-        ) {
-            layoutOptions.forEach { option ->
-                DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth(), // Full width for alignment
-                    text = {
-                        Text(
-                            text = option.toString(),
-                            modifier = Modifier.fillMaxWidth(), // Full width to ensure centering
-                            textAlign = TextAlign.Center, // Center the text within the item
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    },
-                    onClick = {
-                        isDropDownExpanded.value = false
-                        setLayout(option)
-                    }
-                )
+                            )
+                        },
+                        onClick = {
+                            isDropDownExpanded.value = false
+                            setLayout(option)
+                        }
+                    )
+                }
             }
         }
+
+
     }
 }
 

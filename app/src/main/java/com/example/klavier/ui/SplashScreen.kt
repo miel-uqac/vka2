@@ -69,7 +69,7 @@ fun SplashScreen(
                     ,shape = MaterialTheme.shapes.medium
 
                 ) {
-                    Column(Modifier.background(MaterialTheme.colorScheme.tertiary).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(Modifier.background(LightestBlue).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
                         Text(
                             text = value,
@@ -85,7 +85,7 @@ fun SplashScreen(
                             Button(
                                 onClick = { askPermission(context) },
                                 content = { Text("Autoriser", style = MaterialTheme.typography.labelSmall) },
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp),
                                 colors = buttonColors(MaterialTheme.colorScheme.secondary, Color.White)
                             )
                         }
