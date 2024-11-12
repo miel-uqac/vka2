@@ -4,6 +4,7 @@ package com.example.klavier.ui
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,6 +62,7 @@ import com.example.klavier.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.skydoves.colorpicker.compose.*
@@ -79,21 +83,29 @@ fun MainScreen(
 
     Column{
         Row(
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),horizontalArrangement = Arrangement.Center
         ){
             Text(
                 "Klavier",
-                modifier = Modifier.align(Alignment.CenterVertically))
+                modifier = Modifier.align(Alignment.CenterVertically)
+                        .padding(16.dp),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+            )
 
             IconButton(
                 onClick = onSettingsButtonClicked,
-                modifier = Modifier.align(Alignment.CenterVertically)
+                Modifier.align(Alignment.CenterVertically)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
                     contentDescription = "Settings")
             }
         }
+        HorizontalDivider(
+            thickness = 1.dp, // Épaisseur de la ligne
+            color = Color.Gray // Couleur de la ligne
+        )
         TabRow(
             selectedTabIndex = tabIndex) {
             tabs.forEachIndexed { index, title ->
@@ -201,6 +213,7 @@ fun ColorPickerTab(
             modifier = Modifier
                 .weight(0.8f),
             horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
             Box(
                 modifier = Modifier
@@ -279,7 +292,7 @@ fun ColorPickerTab(
             Button(onClick = {
                     sendData("#$hexCode");
             }) {
-                Text(text = "Envoyer")
+                Text(text = "Envoyer", style = MaterialTheme.typography.labelSmall, color = Color.White)
             }
 
         }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Settings
@@ -60,17 +61,21 @@ fun SettingsScreen(
     )
     {
         Row(
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),horizontalArrangement = Arrangement.Center
         ){
             IconButton(onClick = onBackButtonClicked) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "back"
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "back",
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
             Text(
                 "Klavier",
                 modifier = Modifier.align(Alignment.CenterVertically)
+                    .padding(16.dp),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
                 )
 
         }
@@ -129,7 +134,15 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
             .padding(16.dp)
     ) {
         Text(
-            text = "Choose your preferred keyboard layout:",
+            text = "Paramètres"
+            ,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 20.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+        Text(
+            text = "Choissisez le clavier que votre ordinateur utilise:",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -150,7 +163,8 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
             ) {
                 Text(
                     text = "Layout: $layout",
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(modifier = Modifier.width(8.dp)) // Space between text and arrow
                 Icon(
@@ -166,7 +180,7 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
             expanded = isDropDownExpanded.value,
             onDismissRequest = { isDropDownExpanded.value = false },
             modifier = Modifier
-                .fillMaxWidth() // Full width for centered items
+                .fillMaxWidth().padding(16.dp) // Full width for centered items
         ) {
             layoutOptions.forEach { option ->
                 DropdownMenuItem(
@@ -175,7 +189,8 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
                         Text(
                             text = option.toString(),
                             modifier = Modifier.fillMaxWidth(), // Full width to ensure centering
-                            textAlign = TextAlign.Center // Center the text within the item
+                            textAlign = TextAlign.Center, // Center the text within the item
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     },
                     onClick = {
