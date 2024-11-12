@@ -170,6 +170,7 @@ def mouseAction(_str):
     return False
   
 def layoutAction(_str):
+    global kl,layout
     if _str == idUsLayout:
         kl = KeyboardLayoutUS(k)
         layout = "US"

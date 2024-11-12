@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -25,12 +26,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Tab
@@ -57,6 +59,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.example.klavier.R
@@ -64,6 +67,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.skydoves.colorpicker.compose.*
@@ -84,12 +88,15 @@ fun MainScreen(
 
     Column{
         Row(
-            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),horizontalArrangement = Arrangement.Center
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth(),horizontalArrangement = Arrangement.Center
         ){
             Text(
                 "Klavier",
-                modifier = Modifier.align(Alignment.CenterVertically)
-                        .padding(16.dp),
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(16.dp),
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
             )
@@ -138,6 +145,8 @@ fun MainScreen(
         }
     }
 }
+
+
 
 @Composable
 fun MacrosTab(
@@ -201,6 +210,30 @@ fun MacrosTab(
     }
 }
 
+//@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    val sampleMacroLabels = arrayListOf("Macro 1")
+    val sampleMacroIcons = arrayListOf(R.drawable.copy_icon)
+    val sampleMacroFunctions = arrayListOf({})
+
+    MainScreen(
+        sendData = { data -> /* Mock sendData function */ },
+        onSettingsButtonClicked = { /* Mock settings button action */ },
+        macroLabels = sampleMacroLabels,
+        macroIcons = sampleMacroIcons,
+        macroFunctions = sampleMacroFunctions
+    )
+}
+@Preview(showBackground = true)
+@Composable
+fun ColorPickerTabPreview() {
+    ColorPickerTab(
+        sendData = { colorHex -> /* Mock sendData function with colorHex */ }
+    )
+}
+
+
 @Composable
 fun ColorPickerTab(
     sendData: (String) -> Unit
@@ -209,93 +242,120 @@ fun ColorPickerTab(
     val controller = rememberColorPickerController()
     var hexCode by remember { mutableStateOf("") }
     var textColor by remember { mutableStateOf(Color.Transparent) }
-    Row() {
-        Column(
-            modifier = Modifier
-                .weight(0.8f),
-            horizontalAlignment = Alignment.CenterHorizontally
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.dp
 
-        ) {
-            Box(
+    val smallHeight = screenHeight / 100
+    val medHeight = screenHeight / 50
+    val bigHeight = screenHeight / 20
+
+    val smallWidth = screenWidth / 100
+    val medWidth = screenWidth / 50
+    val bigWidth = screenWidth / 20
+
+    Card (
+        modifier = Modifier.padding(horizontal = bigWidth, vertical = medWidth),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.LightGray.copy(0.6f) // Couleur de fond de la Card
+        )
+    ) {
+
+        Row() {
+            Column(
                 modifier = Modifier
-                    .padding(10.dp)
-                    .height(180.dp)
+                    .weight(0.8f),
+                horizontalAlignment = Alignment.CenterHorizontally
+
             ) {
-                HsvColorPicker(
-                    modifier = Modifier.padding(10.dp),
+                Box(
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .height(bigHeight * 4)
+                ) {
+                    HsvColorPicker(
+                        modifier = Modifier.padding(smallWidth),
+                        controller = controller,
+                        drawOnPosSelected = {
+                            drawColorIndicator(
+                                controller.selectedPoint.value,
+                                controller.selectedColor.value,
+                            )
+                        },
+                        onColorChanged = { colorEnvelope ->
+                            hexCode = colorEnvelope.hexCode
+                            textColor = colorEnvelope.color
+                        },
+                        initialColor = Color.Red,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(smallWidth)) // Espacement entre les éléments
+
+                AlphaSlider(
+                    modifier = Modifier
+                        .testTag("HSV_AlphaSlider")
+                        .fillMaxWidth(0.8f)
+                        .padding(smallWidth)
+                        .height(bigHeight)
+                        .align(Alignment.CenterHorizontally),
                     controller = controller,
-                    drawOnPosSelected = {
-                        drawColorIndicator(
-                            controller.selectedPoint.value,
-                            controller.selectedColor.value,
-                        )
-                    },
-                    onColorChanged = { colorEnvelope ->
-                        hexCode = colorEnvelope.hexCode
-                        textColor = colorEnvelope.color
-                    },
-                    initialColor = Color.Red,
+                )
+
+                Spacer(modifier = Modifier.height(smallWidth))
+
+                BrightnessSlider(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(smallWidth)
+                        .height(bigHeight),
+                    controller = controller,
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp)) // Espacement entre les éléments
-
-            AlphaSlider(
+            Column(
                 modifier = Modifier
-                    .testTag("HSV_AlphaSlider")
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp)
-                    .align(Alignment.CenterHorizontally),
-                controller = controller,
-            )
+                    .weight(0.5f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(smallWidth))
 
-            BrightnessSlider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp),
-                controller = controller,
-            )
-        }
+                Text(
+                    text = "#$hexCode",
+                    color = textColor,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(medWidth),
+                )
 
-        Column(
-            modifier = Modifier
-                .weight(0.5f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+                Spacer(modifier = Modifier.height(smallWidth))
 
-            Spacer(modifier = Modifier.height(32.dp))
+                AlphaTile(
+                    modifier = Modifier
+                        .size(bigHeight * 3)
+                        .clip(RoundedCornerShape(6.dp))
+                        .padding(smallWidth)
+                        .align(Alignment.CenterHorizontally),
+                    controller = controller,
+                )
 
-            Text(
-                text = "#$hexCode",
-                color = textColor,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
-            )
+                Spacer(modifier = Modifier.height(32.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AlphaTile(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .align(Alignment.CenterHorizontally),
-                controller = controller,
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(onClick = {
+                Button(onClick = {
                     sendData("#$hexCode");
-            }) {
-                Text(text = "Envoyer", style = MaterialTheme.typography.labelSmall, color = Color.White)
-            }
+                }) {
+                    Text(
+                        text = "Envoyer",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White
+                    )
+                }
 
+            }
         }
     }
 }
@@ -345,20 +405,21 @@ fun KeyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
             },
             label = { Text("Label") },
 
-            modifier = Modifier.onKeyEvent { keyEvent ->
-                if (keyEvent.nativeKeyEvent.keyCode == backspaceKeyCode && input.isEmpty()) {
-                    sendData(backspace)
-                    true
-                } else {
-                    false
-                }}
+            modifier = Modifier
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.nativeKeyEvent.keyCode == backspaceKeyCode && input.isEmpty()) {
+                        sendData(backspace)
+                        true
+                    } else {
+                        false
+                    }
+                }
                 .fillMaxWidth()
                 .alpha(0f)
                 .focusRequester(focusRequester),
 
             singleLine = true,
             textStyle = TextStyle(color = Color.Transparent), // Le texte est également invisible,
-
 
         )
     LaunchedEffect(Unit) {
@@ -410,8 +471,10 @@ fun TouchPad(
                                         (pointer1.previousPosition.y + pointer2.previousPosition.y) / 2
 
                                 if (abs(offsetDelta) > deadZone) { //Creer un autre deadZone ?
-                                    val scrollDirection = if (offsetDelta > 0) -1 else 1 //L'inverse suivant le sens de slide qu'on veut
-                                    val scrollCommand = context.getString(R.string.id_mouse_scroll) + ":H:$scrollDirection"
+                                    val scrollDirection =
+                                        if (offsetDelta > 0) -1 else 1 //L'inverse suivant le sens de slide qu'on veut
+                                    val scrollCommand =
+                                        context.getString(R.string.id_mouse_scroll) + ":H:$scrollDirection"
                                     sendData(scrollCommand)
                                     isHold = false
                                 }
@@ -433,7 +496,7 @@ fun TouchPad(
                                     val delta = firstPosition - lastPosition
                                     val deltaTime = abs(change.uptimeMillis - firstHoldTime)
 
-                                    if (delta.x.toInt() == 0 && delta.y.toInt() == 0 && deltaTime <500) {
+                                    if (delta.x.toInt() == 0 && delta.y.toInt() == 0 && deltaTime < 500) {
                                         // Clic simple : pas de déplacement détecté et click trop court pour être un maintient
                                         sendData(context.getString(R.string.id_click_gauche))
                                         stopEvent = true
@@ -457,8 +520,9 @@ fun TouchPad(
 
                                     if (abs(delta.x) > deadZone || abs(delta.y) > deadZone) {
                                         // Déplacement significatif
-                                        val moveCommand = context.getString(R.string.id_mouse_move) +
-                                                ":${(sensibility*delta.x).toInt()}:${(sensibility*delta.y).toInt()}"
+                                        val moveCommand =
+                                            context.getString(R.string.id_mouse_move) +
+                                                    ":${(sensibility * delta.x).toInt()}:${(sensibility * delta.y).toInt()}"
                                         sendData(moveCommand)
                                     }
 
