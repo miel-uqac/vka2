@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -26,13 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Tab
@@ -346,7 +343,7 @@ fun ColorPickerTab(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(onClick = {
-                    sendData("#$hexCode");
+                    sendData("#$hexCode")
                 }) {
                     Text(
                         text = "Envoyer",
@@ -362,10 +359,10 @@ fun ColorPickerTab(
 
 
 @Composable
-fun KeyboardInput(sendData: (String) -> Unit, modifier: Modifier = Modifier) {
+fun KeyboardInput(sendData: (String) -> Unit) {
     var input by remember { mutableStateOf("") }
     val backspaceKeyCode = Key.Backspace.nativeKeyCode
-    val backspace: String = """\b"""
+    val backspace = """\b"""
     val focusRequester = remember { FocusRequester() }
     TextField(
             value = input,
@@ -588,6 +585,7 @@ fun AddMacrosDialog(
     Dialog(onDismissRequest = { onDismissRequest() })
     {
         Card(
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(375.dp)
@@ -613,11 +611,12 @@ fun AddMacrosDialog(
                     ),
                     modifier = Modifier
                         .size(width = 240.dp, height = 200.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
                 {
                     Column(modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(rememberScrollState(),)
                     ){
                         MacroChip(
                             "couper", R.drawable.cut_icon, {sendData(context.getString(R.string.id_cut))}, tempMacroLabels, tempMacroIcons, tempMacroFunctions, Modifier.align(Alignment.CenterHorizontally)
