@@ -7,9 +7,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +31,7 @@ import kotlin.reflect.KFunction1
 import androidx.compose.ui.platform.LocalContext
 import com.example.klavier.ui.theme.DarkerBlue
 import androidx.compose.ui.graphics.Color
+import com.example.klavier.ui.theme.LightestBlue
 
 @Composable
 fun SplashScreen(
@@ -55,29 +61,35 @@ fun SplashScreen(
                     value = "Veuillez autoriser l'accès USB"
                 }
                 else{
-                        value = "Chargement..."
+                        value = "Chargement.."
                 }
             )
-                Column(modifier = Modifier.align(Alignment.Center)) {
-                    Box(
-                            modifier = Modifier
-                                .height(100.dp)
-                                .width(320.dp)
-                                .background(Color(0xFF98C3D9))
-                            ){
+                Card(modifier = Modifier.align(Alignment.Center)
+                    .width(320.dp)
+                    ,shape = MaterialTheme.shapes.medium
+
+                ) {
+                    Column(Modifier.background(LightestBlue).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+
                         Text(
-                            text=value,
-                            fontSize = 30.sp,
+                            text = value,
+                            style = MaterialTheme.typography.titleLarge,
                             textAlign = TextAlign.Center,
                             color = DarkerBlue,
-                            modifier = Modifier.align(Alignment.Center)
+                            modifier = Modifier.padding(16.dp)
                         )
-                    }
-                    AnimatedVisibility(visible = !hasPermission && connected, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        Button(onClick = { askPermission(context) },
-                            content = { Text("Autoriser") },
+                        AnimatedVisibility(
+                            visible = !hasPermission && connected,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
+                        ) {
+                            Button(
+                                onClick = { askPermission(context) },
+                                content = { Text("Autoriser", style = MaterialTheme.typography.labelSmall) },
+                                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp),
+                                colors = buttonColors(MaterialTheme.colorScheme.secondary, Color.White)
+                            )
+                        }
+
                     }
                 }
     }

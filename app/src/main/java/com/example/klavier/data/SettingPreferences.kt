@@ -1,7 +1,7 @@
 package com.example.klavier.data
 
 enum class Layout {
-    US, FR, UK
+    US, FR
 }
 
 data class SettingPreferences(val isDarkTheme: Boolean,val layout: Layout)
