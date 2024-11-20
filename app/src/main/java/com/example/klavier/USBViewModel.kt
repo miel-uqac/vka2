@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.klavier.data.USBController
 
-class USBViewModel(private val usbController: USBController,context: Context) : ViewModel(){
+class USBViewModel(private val usbController: USBController, context: Context) : ViewModel(){
 
     private var _hasPermission = MutableLiveData(false)
     val hasPermission: LiveData<Boolean> = _hasPermission
@@ -52,3 +53,4 @@ class USBViewModel(private val usbController: USBController,context: Context) : 
     }
 
 }
+
