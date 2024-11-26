@@ -37,7 +37,8 @@ import com.example.klavier.ui.components.TouchPad
 @Composable
 fun MainScreen(
     sendData: (String) -> Unit,
-    onSettingsButtonClicked : () -> Unit = {},
+    sensibility: Float,
+    onSettingsButtonClicked: () -> Unit = {},
     macroLabels: ArrayList<String>,
     macroIcons: ArrayList<Int>,
     macroFunctions: ArrayList<() -> Unit>
@@ -93,7 +94,7 @@ fun MainScreen(
                         macroLabels = macroLabels
 
                     )
-                    TouchPad(sendData = sendData)
+                    TouchPad(sensibility = sensibility, sendData = sendData)
                 }
                 1 -> ColorPickerTab(sendData = sendData)
             }
@@ -118,7 +119,8 @@ fun MainScreenPreview() {
         onSettingsButtonClicked = { /* Mock settings button action */ },
         macroLabels = sampleMacroLabels,
         macroIcons = sampleMacroIcons,
-        macroFunctions = sampleMacroFunctions
+        macroFunctions = sampleMacroFunctions,
+        sensibility = 1.2f
     )
 }
 @Preview(showBackground = true)

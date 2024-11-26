@@ -27,4 +27,10 @@ class SettingViewModel(private val settingPreferencesRepository: SettingPreferen
             sendData(context.getString(R.string.id_layout) + layout.ordinal.toString())
         }
     }
+
+    fun updateSensibility(sensibility: Float) {
+        viewModelScope.launch {
+            settingPreferencesRepository.updateSensibility(sensibility)
+        }
+    }
 }
