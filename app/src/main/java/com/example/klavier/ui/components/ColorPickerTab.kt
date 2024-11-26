@@ -41,8 +41,11 @@ fun ColorPickerTab(
 )
 {
     val controller = rememberColorPickerController()
-    var hexCode by remember { mutableStateOf("") }
-    var textColor by remember { mutableStateOf(Color.Transparent) }
+    var hexCode by remember { mutableStateOf("") } // code hexa a envoyer
+    var textColor by remember { mutableStateOf(Color.Transparent) } //texte d'affichage de la couleur selectionner
+
+
+    // Tailles qui varient en fonction de la taille de l'ecran
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
@@ -75,7 +78,7 @@ fun ColorPickerTab(
                         .padding(0.dp)
                         .height(bigHeight * 4)
                 ) {
-                    HsvColorPicker(
+                    HsvColorPicker( //Color picker central
                         modifier = Modifier.padding(smallWidth),
                         controller = controller,
                         drawOnPosSelected = {
@@ -121,9 +124,9 @@ fun ColorPickerTab(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Spacer(modifier = Modifier.height(smallWidth))
+                Spacer(modifier = Modifier.height(smallWidth)) // Espacement entre les éléments
 
-                Text(
+                Text( // Pour afficher l'hexa de la couleur qui va etre envoye
                     text = "#$hexCode",
                     color = textColor,
                     fontSize = 16.sp,
@@ -133,9 +136,9 @@ fun ColorPickerTab(
                         .padding(medWidth),
                 )
 
-                Spacer(modifier = Modifier.height(smallWidth))
+                Spacer(modifier = Modifier.height(smallWidth)) // Espacement entre les éléments
 
-                AlphaTile(
+                AlphaTile( // Pour voir la couleur selectionner
                     modifier = Modifier
                         .size(bigHeight * 3)
                         .clip(RoundedCornerShape(6.dp))
@@ -144,9 +147,9 @@ fun ColorPickerTab(
                     controller = controller,
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp)) // Espacement entre les éléments
 
-                Button(onClick = {
+                Button(onClick = { // Bouton d'envoie de l'hexa
                     sendData("#$hexCode")
                 }) {
                     Text(

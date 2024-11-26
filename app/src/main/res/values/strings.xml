@@ -22,6 +22,8 @@
     <string name="id_click_droit">#$M02</string>
     <string name="id_mouse_move">#$M1</string>
     <string name="id_mouse_scroll">#$M2</string>
+    <string name="id_mouse_start_hold">#$M31</string>
+    <string name="id_mouse_stop_hold">#$M32</string>
 
     <string name="id_enter">#$E</string>
     <string name="Connect_mc">Veuillez connecter le MC</string>
