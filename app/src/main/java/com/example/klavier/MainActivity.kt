@@ -14,7 +14,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.datastore.core.DataStore
@@ -23,8 +22,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.asLiveData
 import com.example.klavier.data.SettingPreferenceRepository
 import com.example.klavier.data.USBController
-import com.example.klavier.SettingViewModel
-import com.example.klavier.data.Layout
 import com.example.klavier.ui.theme.KlavierTheme
 
 
@@ -39,21 +36,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         usbController = USBController(usbManager = getSystemService(USB_SERVICE) as UsbManager)
-        SettingViewModel = SettingViewModel(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB,this)
         viewModel = USBViewModel(usbController,this)
+        SettingViewModel = SettingViewModel(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB,this)
+
 
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val isDarkTheme = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.isDarkTheme ?: false
-            val layout = SettingViewModel.settingPreferences.collectAsState(initial = Layout.FR).value
+            val sensibility = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.sensibility ?: 1.2f
             KlavierTheme(darkTheme = isDarkTheme) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     KlavierApp(
                         viewModel = viewModel,
                         SettingViewModel = SettingViewModel,
                         isDarkTheme = isDarkTheme,
+                        sensibility = sensibility,
                         modifier = Modifier.padding(innerPadding))
                 }
             }

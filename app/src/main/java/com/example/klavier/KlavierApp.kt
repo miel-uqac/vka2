@@ -35,6 +35,7 @@ fun KlavierApp(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     isDarkTheme: Boolean,
+    sensibility: Float
 
     ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -66,6 +67,7 @@ fun KlavierApp(
             composable(route = KlavierScreen.Main.name) {
                 MainScreen(
                     sendData = viewModel::writeUSB,
+                    sensibility = sensibility,
                     onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) },
                     macroLabels,
                     macroIcons,
@@ -75,6 +77,8 @@ fun KlavierApp(
             composable(route = KlavierScreen.Settings.name) {
                 SettingsScreen(
                     ChangeTheme = SettingViewModel::updateDarkTheme,
+                    ChangeSensibility = SettingViewModel::updateSensibility,
+                    sensibility = sensibility,
                     isDarkTheme = isDarkTheme,
                     SetLayout = SettingViewModel::updateLayout,
                     actualLayout = currentLayout,

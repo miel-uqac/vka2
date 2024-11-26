@@ -17,6 +17,7 @@ import kotlin.math.abs
 
 @Composable
 fun TouchPad(
+    sensibility: Float,
     sendData: (String) -> Unit
 ) {
 
@@ -24,7 +25,6 @@ fun TouchPad(
 
     // PARAMETERS
     val deadZone = 1
-    val sensibility = 2
 
     Box(
         modifier = Modifier

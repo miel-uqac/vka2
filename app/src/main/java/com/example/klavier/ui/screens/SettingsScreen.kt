@@ -12,10 +12,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,14 +33,14 @@ import com.example.klavier.ui.components.settings.ClaviersTab
 @Composable
 fun SettingsScreen(
     ChangeTheme: (Boolean) -> Unit,
+    ChangeSensibility: (Float) -> Unit,
+    sensibility: Float,
     SetLayout: (Layout) -> Unit,
     onBackButtonClicked: () -> Unit = {},
     isDarkTheme: Boolean,
     actualLayout: Layout
 )
 {
-    var tabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Claviers", "Thèmes")
 
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
@@ -46,7 +48,10 @@ fun SettingsScreen(
     )
     {
         Row(
-            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().padding(16.dp),horizontalArrangement = Arrangement.Center
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth()
+                .padding(16.dp),horizontalArrangement = Arrangement.Center
         ){
             IconButton(onClick = onBackButtonClicked) {
                 Icon(
@@ -57,7 +62,8 @@ fun SettingsScreen(
             }
             Text(
                 "Klavier",
-                modifier = Modifier.align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
                     .padding(16.dp),
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
@@ -75,10 +81,13 @@ fun SettingsScreen(
                 ,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(top = 10.dp).align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .align(Alignment.CenterVertically)
             )
         }
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .weight(1f)
             .padding(16.dp),
             horizontalArrangement = Arrangement.Center
@@ -86,35 +95,73 @@ fun SettingsScreen(
                 ClaviersTab(SetLayout, actualLayout)
 
         }
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .weight(1f)
             .padding(16.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             ThemesTab(ChangeTheme, isDarkTheme)
         }
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .padding(16.dp),
+            horizontalArrangement = Arrangement.Center){
+            UpdateSensibility(sensibility, ChangeSensibility)
+        }
     }
 }
+
+@Composable
+fun UpdateSensibility(sensibility: Float, changeSensibility: (Float) -> Unit) {
+    val newSensibility = remember { mutableFloatStateOf(sensibility) }
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Sensibilité de la souris : ${newSensibility.floatValue}",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Slider(
+                value = newSensibility.floatValue,
+                onValueChange = {
+                    newSensibility.floatValue = it
+                    changeSensibility(it)
+                },
+                valueRange = 0.5f..5f,
+                steps = 44,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+    }
+}
+
 
 @Composable
 fun ThemesTab(changeTheme: (Boolean) -> Unit, isDarkTheme: Boolean) {
 
 
-            Box() {
-                Row(horizontalArrangement = Arrangement.Center) {
-                    Text(
-                        text = if (isDarkTheme) "Thème sombre activé" else "Thème clair activé",
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    Switch(
-                        modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterVertically),
-                        checked = isDarkTheme,
-                        onCheckedChange = {
-                            changeTheme(it)
-                        }
-                    )
+    Box() {
+        Row(horizontalArrangement = Arrangement.Center) {
+            Text(
+                text = if (isDarkTheme) "Thème sombre activé" else "Thème clair activé",
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            Switch(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .align(Alignment.CenterVertically),
+                checked = isDarkTheme,
+                onCheckedChange = {
+                    changeTheme(it)
                 }
-            }
+            )
+        }
+    }
+
 }
 
 
