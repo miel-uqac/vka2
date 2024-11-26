@@ -79,10 +79,13 @@ idFrLayout = "#$L1"
 idMouseLeftClick = "#$M01"
 idMouseRightClick = "#$M02"
 idMouseMove = "#$M1" #Sera suivit de la distance sous forme : "#$M1:x:y"
-idMouseSlide = "#$M2" #Sera suivit de la direction (V = vertical ou H = horizontal) et de la direction "#$M2V-1"
+idMouseSlide = "#$M2" #Sera suivit de la direction (V = vertical ou H = horizontal) et de la direction "#$M2V-1", attention vertical n'est pas implementee
+idMouseStartHold = "#$M31"
+idMouseStopHold = "#$M32"
 
 
-def macroAction(_str):
+
+def macroAction(_str): #Liste des commandes liees aux macros 
     if _str == idControlC:
         k.press(Keycode.CONTROL, Keycode.C)
         k.release_all()
@@ -142,7 +145,7 @@ def macroAction(_str):
 
     return False
 
-def mouseAction(_str):
+def mouseAction(_str): #Liste des commandes liees a la souris 
     
     if _str == idMouseLeftClick:
         m.click(Mouse.LEFT_BUTTON)
@@ -163,8 +166,14 @@ def mouseAction(_str):
         if _direction =="H":
             m.move(wheel=int(_wheel))
 
-        #elif(deplacement.startswith("V")):
+        #elif(deplacement.startswith("V")): #TODO 
         
+    elif _str == idMouseStartHold:
+        m.press(Mouse.LEFT_BUTTON)
+
+    elif _str == idMouseStopHold:
+        m.release(Mouse.LEFT_BUTTON)
+
     else:
         return True
 
