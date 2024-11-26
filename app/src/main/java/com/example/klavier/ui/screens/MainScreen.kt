@@ -34,6 +34,8 @@ import com.example.klavier.ui.components.KeyboardInput
 import com.example.klavier.ui.components.macros.MacrosTab
 import com.example.klavier.ui.components.TouchPad
 
+
+// Ecran principal
 @Composable
 fun MainScreen(
     sendData: (String) -> Unit,
@@ -75,6 +77,7 @@ fun MainScreen(
             thickness = 1.dp, // Épaisseur de la ligne
             color = Color.Gray // Couleur de la ligne
         )
+        // Permet de switch entre les macroses et le color picker
         TabRow(
             selectedTabIndex = tabIndex, containerColor = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onPrimary) {
             tabs.forEachIndexed { index, title ->
@@ -87,6 +90,7 @@ fun MainScreen(
         Column (modifier  = Modifier.fillMaxSize(1f)) {
             when (tabIndex) {
                 0 -> {
+                    // Permet d'utiliser les macros
                     MacrosTab(
                         sendData = sendData,
                         macroFunctions = macroFunctions,
@@ -94,6 +98,7 @@ fun MainScreen(
                         macroLabels = macroLabels
 
                     )
+                    // Affiche la zone de souris
                     TouchPad(sensibility = sensibility, sendData = sendData)
                 }
                 1 -> ColorPickerTab(sendData = sendData)
@@ -102,33 +107,10 @@ fun MainScreen(
         }
         Row (modifier = Modifier.align(Alignment.CenterHorizontally)
         ){
+            // Affiche et gère le clavier
             KeyboardInput(sendData, LocalContext.current)
         }
     }
-}
-
-//@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    val sampleMacroLabels = arrayListOf("Macro 1")
-    val sampleMacroIcons = arrayListOf(R.drawable.copy_icon)
-    val sampleMacroFunctions = arrayListOf({})
-
-    MainScreen(
-        sendData = { data -> /* Mock sendData function */ },
-        onSettingsButtonClicked = { /* Mock settings button action */ },
-        macroLabels = sampleMacroLabels,
-        macroIcons = sampleMacroIcons,
-        macroFunctions = sampleMacroFunctions,
-        sensibility = 1.2f
-    )
-}
-@Preview(showBackground = true)
-@Composable
-fun ColorPickerTabPreview() {
-    ColorPickerTab(
-        sendData = { colorHex -> /* Mock sendData function with colorHex */ }
-    )
 }
 
 

@@ -12,6 +12,7 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 
+// classe qui gère l'USB
 class USBController(private val usbManager: UsbManager) {
 
     var m_driver : UsbSerialDriver? = null
@@ -23,6 +24,7 @@ class USBController(private val usbManager: UsbManager) {
     val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     val WRITE_WAIT_MILLIS = 2000
 
+    // Fonction qui gère la permission et l'ouverture de la connexion USB
     fun ManageUSB(context: Context) {
         val availableDrivers: List<UsbSerialDriver> =
             UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
@@ -48,16 +50,15 @@ class USBController(private val usbManager: UsbManager) {
 
             }
     }
+
+    // Fonction qui écrit vers le microcontrôleur
     fun USBWrite(data: String) {
         Log.i("USB", m_port.toString())
         m_port?.write((data+"\r\n").toByteArray(), WRITE_WAIT_MILLIS)
         Log.i("USB", data)
     }
 
-    fun USBRead() {
-        //TODO
-    }
-
+    // Fonction qui demande la permission d'utiliser l'appareil USB
     fun askPermission(context: Context){
         val flags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_MUTABLE else 0
@@ -72,6 +73,7 @@ class USBController(private val usbManager: UsbManager) {
         usbManager.requestPermission(m_driver!!.device, intent)
     }
 
+    // Fonction qui ouvre la connexion USB
     fun connectToDevice(){
         hasDevicePermission = usbManager.hasPermission(m_driver!!.device)
         if (!hasDevicePermission) {
@@ -88,6 +90,7 @@ class USBController(private val usbManager: UsbManager) {
         }
     }
 
+    // Fonction qui ferme la connexion USB
     fun disconnectFromDevice(){
         m_port?.close()
         m_connection?.close()

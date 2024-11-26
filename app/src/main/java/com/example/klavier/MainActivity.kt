@@ -27,6 +27,7 @@ import com.example.klavier.ui.theme.KlavierTheme
 
 class MainActivity : ComponentActivity() {
 
+    // Création des variables globales
     private lateinit var usbController : USBController
     lateinit var viewModel : USBViewModel
     private lateinit var SettingViewModel : SettingViewModel
@@ -58,13 +59,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-
+        // Gère les intents
         val filter = IntentFilter().apply{
         addAction(ACTION_USB_PERMISSION)
         addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
         addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
         }
 
+        // Enregistre le broadcastReceiver
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         {
         registerReceiver(broadcastReceiver, filter, RECEIVER_NOT_EXPORTED)
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    // Définition du broadcastReceiver
     val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
@@ -84,6 +87,7 @@ class MainActivity : ComponentActivity() {
             }
     }
 
+        // Vérifie si l'autorisation d'utiliser le port USB est accordée
     private fun handleUsbPermission(intent: Intent) {
         val granted = intent.extras?.getBoolean(UsbManager.EXTRA_PERMISSION_GRANTED) ?: false
         Log.i("USB", intent.extras.toString())
@@ -99,12 +103,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+    //Détruit le broadcastReceiver
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(broadcastReceiver)
     }
 
     companion object {
+        // Nom du fichier de préférences (datastore)
         private const val USER_PREFERENCES_NAME = "user_preferences"
         const val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
         private val Context.preferencesDataStore: DataStore<Preferences> by preferencesDataStore(name = USER_PREFERENCES_NAME)

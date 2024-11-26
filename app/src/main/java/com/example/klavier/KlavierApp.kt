@@ -28,6 +28,7 @@ enum class KlavierScreen(@StringRes val title: Int) {
     Settings(title = R.string.settings)
 }
 
+// Composant principal de l'application
 @Composable
 fun KlavierApp(
     viewModel: USBViewModel,
@@ -50,12 +51,14 @@ fun KlavierApp(
     var macroIcons by remember { mutableStateOf(ArrayList<Int>()) }
     var macroFunctions by remember { mutableStateOf(ArrayList<() -> Unit>()) }
 
+    //Gère les routes
     Scaffold{ innerPadding ->
         NavHost(
             navController = navController,
             startDestination = KlavierScreen.Start.name,
             modifier = Modifier.padding(innerPadding)
         ) {
+            //Route vers l'écran de démarrage
             composable(route = KlavierScreen.Start.name) {
                 SplashScreen(
                     connected = connected,
@@ -64,6 +67,7 @@ fun KlavierApp(
                     askPermission = viewModel::askPermission
                 )
             }
+            //Route vers l'écran principal
             composable(route = KlavierScreen.Main.name) {
                 MainScreen(
                     sendData = viewModel::writeUSB,
@@ -74,6 +78,7 @@ fun KlavierApp(
                     macroFunctions
                 )
             }
+            //Route vers l'écran de paramètres
             composable(route = KlavierScreen.Settings.name) {
                 SettingsScreen(
                     ChangeTheme = SettingViewModel::updateDarkTheme,
@@ -86,6 +91,7 @@ fun KlavierApp(
                 )
             }
         }
+        //Si la permission n'est pas accordée, navigue vers l'écran de démarrage
         LaunchedEffect(!hasPermission) {
             if(!hasPermission) {
                 navController.navigate(route =KlavierScreen.Start.name)

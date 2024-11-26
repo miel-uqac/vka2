@@ -28,7 +28,10 @@ import kotlin.reflect.KFunction1
 import androidx.compose.ui.platform.LocalContext
 import com.example.klavier.ui.theme.DarkerBlue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import com.example.klavier.ui.theme.LightestBlue
+
+// Screen composable that displays the splash screen
 
 @Composable
 fun SplashScreen(
@@ -50,23 +53,28 @@ fun SplashScreen(
                 .fillMaxSize()
         )
             var value: String = ""
+        // Gère l'affichage du texte en fonction de la connexion et de la permission
             if(!connected){
-                value = "Veuillez connecter le MC"
+                value = stringResource(R.string.Connect_mc)
             }
             else(
                 if(!hasPermission){
-                    value = "Veuillez autoriser l'accès USB"
+                    value = stringResource(R.string.Authorize_usb)
                 }
                 else{
-                        value = "Chargement.."
+                        value = stringResource(R.string.Charge)
                 }
             )
-                Card(modifier = Modifier.align(Alignment.Center)
+                Card(modifier = Modifier
+                    .align(Alignment.Center)
                     .width(320.dp)
                     ,shape = MaterialTheme.shapes.medium
 
                 ) {
-                    Column(Modifier.background(LightestBlue).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        Modifier
+                            .background(LightestBlue)
+                            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
                         Text(
                             text = value,
@@ -75,14 +83,17 @@ fun SplashScreen(
                             color = DarkerBlue,
                             modifier = Modifier.padding(16.dp)
                         )
+                        // Si la permission n'est pas accordée et que la connexion est active, affiche le bouton d'autorisation
                         AnimatedVisibility(
                             visible = !hasPermission && connected,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
                             Button(
                                 onClick = { askPermission(context) },
-                                content = { Text("Autoriser", style = MaterialTheme.typography.labelSmall) },
-                                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp),
+                                content = { Text(stringResource(R.string.Authorize), style = MaterialTheme.typography.labelSmall) },
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(bottom = 16.dp),
                                 colors = buttonColors(MaterialTheme.colorScheme.secondary, Color.White)
                             )
                         }
@@ -90,6 +101,7 @@ fun SplashScreen(
                     }
                 }
     }
+    // If hasPermission is true, get the main screen
     LaunchedEffect(hasPermission) {
         if(hasPermission) {
             onGranted()
