@@ -1,4 +1,4 @@
-package com.example.klavier
+package com.example.klavier.data
 
 import android.app.PendingIntent
 import android.content.Context

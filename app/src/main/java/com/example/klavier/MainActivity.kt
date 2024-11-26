@@ -14,6 +14,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.datastore.core.DataStore
@@ -21,6 +22,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.asLiveData
 import com.example.klavier.data.SettingPreferenceRepository
+import com.example.klavier.data.USBController
+import com.example.klavier.SettingViewModel
+import com.example.klavier.data.Layout
 import com.example.klavier.ui.theme.KlavierTheme
 
 
@@ -28,21 +32,22 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var usbController : USBController
     lateinit var viewModel : USBViewModel
-    private lateinit var SettingViewModel : SettingModelView
+    private lateinit var SettingViewModel : SettingViewModel
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        usbController = USBController(usbManager = getSystemService(Context.USB_SERVICE) as UsbManager)
+        usbController = USBController(usbManager = getSystemService(USB_SERVICE) as UsbManager)
+        SettingViewModel = SettingViewModel(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB,this)
         viewModel = USBViewModel(usbController,this)
-        SettingViewModel = SettingModelView(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB,this)
 
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val isDarkTheme = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.isDarkTheme ?: false
+            val layout = SettingViewModel.settingPreferences.collectAsState(initial = Layout.FR).value
             KlavierTheme(darkTheme = isDarkTheme) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     KlavierApp(

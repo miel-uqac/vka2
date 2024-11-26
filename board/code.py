@@ -71,6 +71,7 @@ idControlD = "#$012"
 
 #---CLAVIER---
 idBackspace = r"\b"
+idEnter = "#$E"
 idUsLayout = "#$L0"
 idFrLayout = "#$L1"
 
@@ -206,12 +207,18 @@ while True:
         elif _str == idBackspace:
             k.send(Keycode.BACKSPACE)
             envoie = False
+        
+        elif _str == idEnter:
+            k.send(Keycode.ENTER)
+            envoie = False
             
         elif _str.startswith("#$L"):
             envoie = layoutAction(_str)
         
         if envoie:
-            kl.write(_str)
-            
+            try:
+                kl.write(_str)
+            except KeyError:
+                pass
 
-    ble.start_advertising(advertisement)
+    ble.start_advertising(advertisement)#$E
