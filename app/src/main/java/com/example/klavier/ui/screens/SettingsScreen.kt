@@ -24,12 +24,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.klavier.R
 import com.example.klavier.data.Layout
 import com.example.klavier.ui.components.settings.ClaviersTab
 
-
+// Ecran de paramètres
 @Composable
 fun SettingsScreen(
     ChangeTheme: (Boolean) -> Unit,
@@ -92,6 +94,7 @@ fun SettingsScreen(
             .padding(16.dp),
             horizontalArrangement = Arrangement.Center
         ) {
+                // Composant permettant de renseigner le layout clavier du pc cible
                 ClaviersTab(SetLayout, actualLayout)
 
         }
@@ -113,6 +116,7 @@ fun SettingsScreen(
     }
 }
 
+// Composant permettant de changer la sensibilité de la souris
 @Composable
 fun UpdateSensibility(sensibility: Float, changeSensibility: (Float) -> Unit) {
     val newSensibility = remember { mutableFloatStateOf(sensibility) }
@@ -139,7 +143,7 @@ fun UpdateSensibility(sensibility: Float, changeSensibility: (Float) -> Unit) {
     }
 }
 
-
+// Composant permettant de changer le thème
 @Composable
 fun ThemesTab(changeTheme: (Boolean) -> Unit, isDarkTheme: Boolean) {
 
@@ -147,7 +151,7 @@ fun ThemesTab(changeTheme: (Boolean) -> Unit, isDarkTheme: Boolean) {
     Box() {
         Row(horizontalArrangement = Arrangement.Center) {
             Text(
-                text = if (isDarkTheme) "Thème sombre activé" else "Thème clair activé",
+                text = if (isDarkTheme) stringResource(R.string.thm_sombre) else stringResource(R.string.thm_clair),
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Switch(

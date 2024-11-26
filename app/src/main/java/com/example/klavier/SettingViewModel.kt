@@ -7,6 +7,8 @@ import com.example.klavier.data.Layout
 import com.example.klavier.data.SettingPreferenceRepository
 import kotlinx.coroutines.launch
 
+
+// ViewModel pour la gestion des préférences d'application, permet de mettre à jour les préférences et de les lire
 class SettingViewModel(private val settingPreferencesRepository: SettingPreferenceRepository,
                        private val sendData: (String) -> Unit
                        , private val context: Context
@@ -14,6 +16,7 @@ class SettingViewModel(private val settingPreferencesRepository: SettingPreferen
 
     val settingPreferences = settingPreferencesRepository.SettingPreferencesFlow
 
+    //met à jour la préférence du thème
     fun updateDarkTheme(isDarkTheme: Boolean) {
         viewModelScope.launch {
             settingPreferencesRepository.updateDarkTheme(isDarkTheme)
@@ -21,6 +24,7 @@ class SettingViewModel(private val settingPreferencesRepository: SettingPreferen
 
     }
 
+    //met à jour la préférence du layout
     fun updateLayout(layout: Layout) {
         viewModelScope.launch {
             settingPreferencesRepository.updateLayout(layout)
@@ -28,6 +32,7 @@ class SettingViewModel(private val settingPreferencesRepository: SettingPreferen
         }
     }
 
+    //met à jour la préférence de la sensibilité
     fun updateSensibility(sensibility: Float) {
         viewModelScope.launch {
             settingPreferencesRepository.updateSensibility(sensibility)

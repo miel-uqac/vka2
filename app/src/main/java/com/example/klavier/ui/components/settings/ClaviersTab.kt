@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.klavier.data.Layout
 
+// Composant permettant de changer le layout du clavier
 @Composable
 fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
     val isDropDownExpanded = remember { mutableStateOf(false) }
@@ -70,7 +71,7 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-            // Dropdown menu positioned directly below the dropdown button
+            // Dropdown menu qui contient les options de layout
             DropdownMenu(
                 expanded = isDropDownExpanded.value,
                 onDismissRequest = { isDropDownExpanded.value = false },
