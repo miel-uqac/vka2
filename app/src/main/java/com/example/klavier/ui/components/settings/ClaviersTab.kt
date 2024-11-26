@@ -23,8 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.klavier.R
 import com.example.klavier.data.Layout
 
 // Composant permettant de changer le layout du clavier
@@ -40,10 +42,11 @@ fun ClaviersTab(setLayout: (Layout) -> Unit, layout: Layout) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Choissisez le clavier que votre ordinateur utilise:",
+            text = stringResource(R.string.choose_layout),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier
+                .padding(bottom = 8.dp)
                 .align(Alignment.CenterHorizontally)
         )
         // Main dropdown button with centered text and arrow
