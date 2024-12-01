@@ -47,6 +47,7 @@ fun KlavierApp(
         backStackEntry?.destination?.route ?: KlavierScreen.Start.name
     )
 
+    // Création des tableaux des macros
     var macroLabels by remember { mutableStateOf(ArrayList<String>()) }
     var macroIcons by remember { mutableStateOf(ArrayList<Int>()) }
     var macroFunctions by remember { mutableStateOf(ArrayList<() -> Unit>()) }
@@ -73,6 +74,8 @@ fun KlavierApp(
                     sendData = viewModel::writeUSB,
                     sensibility = sensibility,
                     onSettingsButtonClicked = { navController.navigate(route = KlavierScreen.Settings.name) },
+
+                    // Les tableaux des macros sont passés en paramètre à l'écran principal
                     macroLabels,
                     macroIcons,
                     macroFunctions

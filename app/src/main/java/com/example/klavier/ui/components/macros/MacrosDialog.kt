@@ -40,10 +40,12 @@ fun AddMacrosDialog(
     macroFunctions : ArrayList<() -> Unit>
 )
 {
+    // Tableaux temporaires pour stocker les données des macros
     var tempMacroLabels by remember { mutableStateOf(ArrayList<String>()) }
     var tempMacroIcons by remember { mutableStateOf(ArrayList<Int>()) }
     var tempMacroFunctions by remember { mutableStateOf(ArrayList<() -> Unit>()) }
 
+    // Les tableaux temporaires sont remplis des données déjà dans les tableaux globaux
     tempMacroLabels.addAll(macroLabels)
     tempMacroIcons.addAll(macroIcons)
     tempMacroFunctions.addAll(macroFunctions)
@@ -80,6 +82,7 @@ fun AddMacrosDialog(
                         .align(Alignment.CenterHorizontally)
                 )
                 {
+                    // Liste de macros à ajouter
                     Column(modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .verticalScroll(rememberScrollState(),)
@@ -129,6 +132,7 @@ fun AddMacrosDialog(
                     }
                 }
 
+                // Boutons "Ajouter" et "Annuler"
                 Row(modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                 ){

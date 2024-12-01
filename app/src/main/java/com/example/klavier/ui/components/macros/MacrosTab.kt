@@ -33,7 +33,7 @@ fun MacrosTab(
             modifier = Modifier
                 .height(50.dp)
         ) {
-            // macro copier
+            // macro copier (macro présente par défaut)
             item{
                 GridItem(
                     onClick = {
@@ -43,7 +43,7 @@ fun MacrosTab(
                     contentDescription = "copier"
                 )
             }
-            // macro coller
+            // macro coller (macro présente par défaut)
             item{
                 GridItem(
                     onClick = {
@@ -53,6 +53,8 @@ fun MacrosTab(
                     contentDescription = "coller"
                 )
             }
+            // Ajout d'autres macros selon le dialogue de sélection
+            // Pour chaque élément du tableau "macroLabels" on crée un nouveau bouton avec pour fonction et icone les éléments au même indice que le label dans leur tableau respectif
             items(macroLabels) {arrayItem ->
                 GridItem(
                     onClick = macroFunctions[macroLabels.indexOf(arrayItem)],
@@ -61,6 +63,7 @@ fun MacrosTab(
                 )
             }
         }
+        // Bouton pour ouvrir le dialogue d'ajout de macros
         Row(modifier = Modifier.align(Alignment.Start))
         {
             var showDialog by remember { mutableStateOf(false) }

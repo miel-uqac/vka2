@@ -44,6 +44,7 @@ fun SplashScreen(
 {
     val context = LocalContext.current
     Box(modifier) {
+        // image de fond
         Image(
             painter = painterResource(R.drawable.splashscreenimage2),
             contentDescription = null,
@@ -65,6 +66,7 @@ fun SplashScreen(
                         value = stringResource(R.string.Charge)
                 }
             )
+                // dialogue demandant l'autorisation de bluetooth
                 Card(modifier = Modifier
                     .align(Alignment.Center)
                     .width(320.dp)

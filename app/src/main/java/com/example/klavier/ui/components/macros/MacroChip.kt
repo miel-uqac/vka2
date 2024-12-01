@@ -27,6 +27,7 @@ fun MacroChip(
 
     FilterChip(
         onClick = {
+            // Quand un MacroChip est sélectionné les données de la macro associée sont ajoutées au tableau
             selected = !selected
             if (selected) {
                 if (!macroLabels.contains(label)) {
@@ -35,6 +36,7 @@ fun MacroChip(
                     macroFunctions.add(onClick)
                 }
             }
+            // Quand le MacroChip est déselectionné les données de la macro associée sont retirées du tableau
             else {
                 macroLabels.remove(label)
                 macroIcons.remove(iconResource)

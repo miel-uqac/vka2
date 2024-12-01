@@ -41,6 +41,8 @@ fun MainScreen(
     sendData: (String) -> Unit,
     sensibility: Float,
     onSettingsButtonClicked: () -> Unit = {},
+
+    // Les tableaux des macros sont passés depuis "KlavierApp.kt"
     macroLabels: ArrayList<String>,
     macroIcons: ArrayList<Int>,
     macroFunctions: ArrayList<() -> Unit>
@@ -77,7 +79,7 @@ fun MainScreen(
             thickness = 1.dp, // Épaisseur de la ligne
             color = Color.Gray // Couleur de la ligne
         )
-        // Permet de switch entre les macroses et le color picker
+        // Permet de switch entre les macros et le color picker
         TabRow(
             selectedTabIndex = tabIndex, containerColor = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onPrimary) {
             tabs.forEachIndexed { index, title ->
@@ -90,7 +92,8 @@ fun MainScreen(
         Column (modifier  = Modifier.fillMaxSize(1f)) {
             when (tabIndex) {
                 0 -> {
-                    // Permet d'utiliser les macros
+                    // Onglet des macros
+                    // les tableaux concernant les macros sont passés en paramètre du "MacrosTab"
                     MacrosTab(
                         sendData = sendData,
                         macroFunctions = macroFunctions,
@@ -98,7 +101,7 @@ fun MainScreen(
                         macroLabels = macroLabels
 
                     )
-                    // Affiche la zone de souris
+                    // Onglet du color picker
                     TouchPad(sensibility = sensibility, sendData = sendData)
                 }
                 1 -> ColorPickerTab(sendData = sendData)
