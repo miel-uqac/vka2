@@ -1,4 +1,4 @@
-package com.example.klavier
+package com.example.klavier.data
 
 import android.app.PendingIntent
 import android.content.Context
@@ -12,6 +12,7 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 
+// classe qui gère l'USB
 class USBController(private val usbManager: UsbManager) {
 
     var m_driver : UsbSerialDriver? = null
@@ -23,6 +24,7 @@ class USBController(private val usbManager: UsbManager) {
     val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     val WRITE_WAIT_MILLIS = 2000
 
+    // Fonction qui gère la permission et l'ouverture de la connexion USB
     fun ManageUSB(context: Context) {
         val availableDrivers: List<UsbSerialDriver> =
             UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
@@ -35,11 +37,6 @@ class USBController(private val usbManager: UsbManager) {
         if (m_driver != null) {
             m_device = m_driver!!.device
             Log.i("USB", "USB device name: " + m_device!!.deviceName)
-
-            val flags =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_MUTABLE else 0
-            val intent: PendingIntent =
-                PendingIntent.getBroadcast( context,0, Intent(ACTION_USB_PERMISSION), flags)
             hasDevicePermission = usbManager.hasPermission(m_driver!!.device)
             if (hasDevicePermission) {
                 // Permission already granted, no need to request
@@ -47,22 +44,36 @@ class USBController(private val usbManager: UsbManager) {
                 Log.i("USB", "USB permission not requested")
             } else {
                 // Request permission
-                usbManager.requestPermission(m_driver!!.device, intent)
+                askPermission(context)
                 Log.i("USB", "USB permission requested")
             }
 
             }
     }
+
+    // Fonction qui écrit vers le microcontrôleur
     fun USBWrite(data: String) {
         Log.i("USB", m_port.toString())
         m_port?.write((data+"\r\n").toByteArray(), WRITE_WAIT_MILLIS)
         Log.i("USB", data)
     }
 
-    fun USBRead() {
-        //TODO
+    // Fonction qui demande la permission d'utiliser l'appareil USB
+    fun askPermission(context: Context){
+        val flags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_MUTABLE else 0
+        val intent: PendingIntent = if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (U) */) {
+            val intent =  Intent(ACTION_USB_PERMISSION)
+            intent.setPackage(context.packageName)
+            PendingIntent.getBroadcast(context, 0, intent, flags)
+        }
+        else{
+            PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
+        }
+        usbManager.requestPermission(m_driver!!.device, intent)
     }
 
+    // Fonction qui ouvre la connexion USB
     fun connectToDevice(){
         hasDevicePermission = usbManager.hasPermission(m_driver!!.device)
         if (!hasDevicePermission) {
@@ -79,6 +90,7 @@ class USBController(private val usbManager: UsbManager) {
         }
     }
 
+    // Fonction qui ferme la connexion USB
     fun disconnectFromDevice(){
         m_port?.close()
         m_connection?.close()

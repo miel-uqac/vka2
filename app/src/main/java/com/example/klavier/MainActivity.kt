@@ -14,38 +14,59 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.asLiveData
+import com.example.klavier.data.SettingPreferenceRepository
+import com.example.klavier.data.USBController
 import com.example.klavier.ui.theme.KlavierTheme
 
 
 class MainActivity : ComponentActivity() {
 
-    lateinit var usbController : USBController
+    // Création des variables globales
+    private lateinit var usbController : USBController
     lateinit var viewModel : USBViewModel
+    private lateinit var SettingViewModel : SettingViewModel
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        usbController = USBController(usbManager = getSystemService(Context.USB_SERVICE) as UsbManager)
+        usbController = USBController(usbManager = getSystemService(USB_SERVICE) as UsbManager)
         viewModel = USBViewModel(usbController,this)
+        SettingViewModel = SettingViewModel(SettingPreferenceRepository(dataStore = preferencesDataStore),viewModel::writeUSB,this)
+
+
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            KlavierTheme {
+            val isDarkTheme = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.isDarkTheme ?: false
+            val sensibility = SettingViewModel.settingPreferences.asLiveData().observeAsState().value?.sensibility ?: 1.2f
+            KlavierTheme(darkTheme = isDarkTheme) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     KlavierApp(
                         viewModel = viewModel,
+                        SettingViewModel = SettingViewModel,
+                        isDarkTheme = isDarkTheme,
+                        sensibility = sensibility,
                         modifier = Modifier.padding(innerPadding))
                 }
             }
         }
 
-
+        // Gère les intents
         val filter = IntentFilter().apply{
         addAction(ACTION_USB_PERMISSION)
         addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
         addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
         }
 
+        // Enregistre le broadcastReceiver
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         {
         registerReceiver(broadcastReceiver, filter, RECEIVER_NOT_EXPORTED)
@@ -56,6 +77,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    // Définition du broadcastReceiver
     val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
@@ -65,6 +87,7 @@ class MainActivity : ComponentActivity() {
             }
     }
 
+        // Vérifie si l'autorisation d'utiliser le port USB est accordée
     private fun handleUsbPermission(intent: Intent) {
         val granted = intent.extras?.getBoolean(UsbManager.EXTRA_PERMISSION_GRANTED) ?: false
         Log.i("USB", intent.extras.toString())
@@ -80,13 +103,17 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+    //Détruit le broadcastReceiver
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(broadcastReceiver)
     }
 
     companion object {
+        // Nom du fichier de préférences (datastore)
+        private const val USER_PREFERENCES_NAME = "user_preferences"
         const val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+        private val Context.preferencesDataStore: DataStore<Preferences> by preferencesDataStore(name = USER_PREFERENCES_NAME)
     }
 }
 
